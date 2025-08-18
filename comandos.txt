@@ -1,0 +1,8 @@
+# Criar a pasta bin (se não existir)
+mkdir -p bin
+
+# Compilar recursivamente todos os arquivos .java da pasta
+find . -name "*.java" | xargs javac -d bin
+
+# Executar a classe principal
+java -cp bin Principal

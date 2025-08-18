@@ -295,12 +295,12 @@ public class MenuClientes {
     public void mostraCliente(Cliente cliente) {
     if (cliente != null) {
         System.out.println("\nDetalhes do Cliente:");
-        System.out.println("----------------------");
+        System.out.println("-----------------------");
         System.out.printf("Nome......: %s%n", cliente.nome);
         System.out.printf("CPF.......: %s%n", cliente.cpf);
         System.out.printf("Salário...: R$ %.2f%n", cliente.salario);
         System.out.printf("Nascimento: %s%n", cliente.nascimento.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-        System.out.println("----------------------");
+        System.out.println("-----------------------");
     }
 }
 }
