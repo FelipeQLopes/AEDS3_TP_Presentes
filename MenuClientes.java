@@ -6,6 +6,7 @@ public class MenuClientes {
     
     ArquivoCliente arqClientes;
     private static Scanner console = new Scanner(System.in);
+    
 
     public MenuClientes() throws Exception {
         arqClientes = new ArquivoCliente();
@@ -16,14 +17,12 @@ public class MenuClientes {
         int opcao;
         do {
 
-            System.out.println("\n\nAEDsIII");
-            System.out.println("-------");
-            System.out.println("> Início > Clientes");
-            System.out.println("\n1 - Buscar");
-            System.out.println("2 - Incluir");
-            System.out.println("3 - Alterar");
-            System.out.println("4 - Excluir");
-            System.out.println("0 - Voltar");
+            System.out.println("\n\nPresenteFácil 1.0");
+            System.out.println("----------------");
+            System.out.println(">");
+            System.out.println("\n1 - Login");
+            System.out.println("2 - Novo Usuário");
+            System.out.println("0 - Sair");
 
             System.out.print("\nOpção: ");
             try {
@@ -34,15 +33,18 @@ public class MenuClientes {
 
             switch (opcao) {
                 case 1:
-                    buscarCliente();
-                    break;
+                    login();
+                    break;                
                 case 2:
                     incluirCliente();
                     break;
-                case 3:
+                case 10:
+                    buscarCliente();
+                    break;
+                case 30:
                     alterarCliente();
                     break;
-                case 4:
+                case 40:
                     excluirCliente();
                     break;
                 case 0:
@@ -55,6 +57,9 @@ public class MenuClientes {
         } while (opcao != 0);
     }
 
+    public void login(){
+
+    }
 
     public void buscarCliente() {
         System.out.println("\nBusca de cliente");
@@ -92,10 +97,14 @@ public class MenuClientes {
 
     public void incluirCliente() {
         System.out.println("\nInclusão de cliente");
+        System.out.println("-------------------");
         String nome = "";
         String cpf = "";
-        float salario = 0;
-        LocalDate dataNascimento = null;
+        String email = "";
+        String perguntaSecreta = "";
+        String respostaSecreta = "";
+        String hashSenha = "";
+        LocalDate nascimento = null;
         boolean dadosCorretos = false;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
@@ -116,23 +125,39 @@ public class MenuClientes {
         } while(cpf.length()!=11 && cpf.length()!=0);
 
         do {
-            dadosCorretos = false;
-            System.out.print("Salário: ");
-            if (console.hasNextFloat()) {
-                salario = console.nextFloat();
-                dadosCorretos = true;
-            } else {
-                System.err.println("Salário inválido! Por favor, insira um número válido.");
-            }
-            console.nextLine(); // Limpar o buffer 
-        } while(!dadosCorretos);
+            System.out.print("Email: ");
+            email = console.nextLine();
+            if(!(email.contains("@") && email.contains(".") && email.length() > 10))
+                System.err.println("O Email deve ser um email válido");
+        } while(!(email.contains("@") && email.contains(".") && email.length() > 10));
+
+        do {
+            System.out.print("Senha: ");
+            hashSenha = console.nextLine();
+            if(hashSenha.length() < 6)
+                System.err.println("A senha tem que ter no mínimo 6 dígitos");
+        } while(hashSenha.length() < 6);
+        
+        do {
+            System.out.print("Pergunta Secreta: ");
+            perguntaSecreta = console.nextLine();
+            if(perguntaSecreta.length()<10 || !(perguntaSecreta.contains("?")))
+                System.err.println("Escreva uma pergunta váilida com ? e mais de 10 caracteres.");
+        } while(perguntaSecreta.length()<10 || !(perguntaSecreta.contains("?")));
+        
+        do {
+            System.out.print("Resposta Secreta: ");
+            perguntaSecreta = console.nextLine();
+            if(perguntaSecreta.length()<10)
+                System.err.println("Escreva uma pergunta váilida com ? e mais de 10 caracteres.");
+        } while(perguntaSecreta.length()<10);
 
         do {
             System.out.print("Data de nascimento (DD/MM/AAAA): ");
             String dataStr = console.nextLine();
             dadosCorretos = false;
             try {
-                dataNascimento = LocalDate.parse(dataStr, formatter);
+                nascimento = LocalDate.parse(dataStr, formatter);
                 dadosCorretos = true;
             } catch (Exception e) {
                 System.err.println("Data inválida! Use o formato DD/MM/AAAA.");
@@ -143,7 +168,7 @@ public class MenuClientes {
         char resp = console.nextLine().charAt(0);
         if(resp=='S' || resp=='s') {
             try {
-                Cliente c = new Cliente(nome, cpf, salario, dataNascimento);
+                Cliente c = new Cliente(nome, cpf, email, perguntaSecreta, respostaSecreta, hashSenha, nascimento);
                 arqClientes.create(c);
                 System.out.println("Cliente incluído com sucesso.");
             } catch(Exception e) {
@@ -193,16 +218,33 @@ public class MenuClientes {
                 if (!novoCpf.isEmpty()) {
                     cliente.cpf = novoCpf;  // Atualiza o CPF se fornecido
                 }
-
-                // Alteração de salário
-                System.out.print("Novo salário (deixe em branco para manter o anterior): ");
-                String novoSalarioStr = console.nextLine();
-                if (!novoSalarioStr.isEmpty()) {
-                    try {
-                        cliente.salario = Float.parseFloat(novoSalarioStr);  // Atualiza o salário se fornecido
-                    } catch (NumberFormatException e) {
-                        System.err.println("Salário inválido. Valor mantido.");
-                    }
+                
+                // Alteração de Email
+                System.out.print("Novo Email (deixe em branco para manter o anterior): ");
+                String novoEmail = console.nextLine();
+                if (!novoCpf.isEmpty()) {
+                    cliente.email = novoEmail;  // Atualiza o Email se fornecido
+                }
+                
+                // Alteração de Pergunta Secreta
+                System.out.print("Nova Pergunta Secreta (deixe em branco para manter o anterior): ");
+                String novaPerguntaSecreta = console.nextLine();
+                if (!novaPerguntaSecreta.isEmpty()) {
+                    cliente.perguntaSecreta = novaPerguntaSecreta; // Atualiza a Pergunta Secreta se fornecido
+                }
+                
+                // Alteração de Resposta Secreta
+                System.out.print("Nova Resposta Secreta (deixe em branco para manter o anterior): ");
+                String novaRespostaSecreta = console.nextLine();
+                if (!novaRespostaSecreta.isEmpty()) {
+                    cliente.respostaSecreta = novaRespostaSecreta;  // Atualiza a Resposta Secreta se fornecido
+                }
+                
+                // Alteração de Senha
+                System.out.print("Nova Resposta Secreta (deixe em branco para manter o anterior): ");
+                String hashSenha = console.nextLine();
+                if (!hashSenha.isEmpty()) {
+                    cliente.hashSenha = Cliente.gerarHash(hashSenha);  // Atualiza a Senha
                 }
 
                 // Alteração de data de nascimento
@@ -295,12 +337,12 @@ public class MenuClientes {
     public void mostraCliente(Cliente cliente) {
     if (cliente != null) {
         System.out.println("\nDetalhes do Cliente:");
-        System.out.println("-----------------------");
+        System.out.println("----------------------");
         System.out.printf("Nome......: %s%n", cliente.nome);
         System.out.printf("CPF.......: %s%n", cliente.cpf);
-        System.out.printf("Salário...: R$ %.2f%n", cliente.salario);
+        System.out.printf("Email.....: %s%n", cliente.email);
         System.out.printf("Nascimento: %s%n", cliente.nascimento.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-        System.out.println("-----------------------");
+        System.out.println("----------------------");
     }
 }
 }

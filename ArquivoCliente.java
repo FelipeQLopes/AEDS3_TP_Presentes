@@ -10,8 +10,8 @@ public class ArquivoCliente extends aed3.Arquivo<Cliente> {
         indiceIndiretoCPF = new HashExtensivel<>(
             ParCPFID.class.getConstructor(), 
             4, 
-            ".\\dados\\clientes\\indiceCPF.d.db",   // diretório
-            ".\\dados\\clientes\\indiceCPF.c.db"    // cestos 
+            "./dados/clientes/indiceCPF.d.db",   // diretório
+            "./dados/clientes/indiceCPF.c.db"    // cestos 
         );
     }
 
