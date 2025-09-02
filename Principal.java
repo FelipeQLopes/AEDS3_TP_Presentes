@@ -27,7 +27,7 @@ public static void main(String[] args) {
 
             switch (opcao) {
                 case 1:
-                    (new MenuClientes()).menu();
+                    (new MenuUsuario()).menu();
                     break;
                 case 0:
                     break;

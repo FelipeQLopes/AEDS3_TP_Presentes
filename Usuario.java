@@ -10,7 +10,7 @@ import java.io.DataInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class Cliente implements Registro {
+public class Usuario implements Registro {
 
     public int id;
     public String nome;
@@ -22,14 +22,14 @@ public class Cliente implements Registro {
     public LocalDate nascimento;
     public int idCategoria;
 
-    public Cliente() {
+    public Usuario() {
         this(-1, "", "", "", "", "", "", LocalDate.now());
     }
-    public Cliente(String n, String c, String e, String p, String r, String s, LocalDate d) {
+    public Usuario(String n, String c, String e, String p, String r, String s, LocalDate d) {
         this(-1, n, c, e, p, r, s, d);
     }
 
-    public Cliente(int i, String n, String c, String e, String p, String r, String s, LocalDate d) {
+    public Usuario(int i, String n, String c, String e, String p, String r, String s, LocalDate d) {
         this.id = i;
         this.nome = n;
         this.cpf = c;
