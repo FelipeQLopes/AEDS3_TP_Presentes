@@ -6,3 +6,8 @@ find . -name "*.java" | xargs javac -d bin
 
 # Executar a classe principal
 java -cp bin Principal
+
+
+Executar com a biblioteca NanoID:
+javac -cp ".;libs/jnanoid-2.0.0.jar" Lista.java
+java -cp ".;libs/jnanoid-2.0.0.jar" Lista  
