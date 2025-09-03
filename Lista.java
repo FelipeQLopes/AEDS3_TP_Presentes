@@ -2,13 +2,14 @@ import java.time.LocalDate;
 
 import aed3.Registro;
 
+import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import java.io.IOException;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
-
-public class Lista implements Registro {
+//implements Registo
+public class Lista {
 
     public int id;
     public String nome;
@@ -16,21 +17,27 @@ public class Lista implements Registro {
     public String codigo;
     public LocalDate dataCriacao;
     public LocalDate dataLimite;
+    
 
-    public Lista() {
-        this(-1, "", "", "", LocalDate.now(), LocalDate.now().plusDays(7));
-    }
-    public Lista(String n, String d, String c, LocalDate d1, LocalDate d2) {
-        this(-1, n, d, c, d1, d2);
+    //N se torna necessário, n existe lista sem dados
+    /*public Lista() {
+        this(-1, "", "", LocalDate.now(), LocalDate.now().plusDays(7));
+    }*/
+
+    public Lista(String n, String d, LocalDate d2) {
+        this(-1, n, d, d2);
+       
     }
 
-    public Lista(int i, String n, String d, String c, LocalDate d1, LocalDate d2) {
+    public Lista(int i, String n, String d, LocalDate d2) {
         this.id = i;
         this.nome = n;
         this.descricao = d;
-        this.codigo = c;
-        this.dataCriacao = d1;
+        this.dataCriacao = LocalDate.now();
         this.dataLimite = d2;
+        this.codigo=NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR,
+                                           NanoIdUtils.DEFAULT_ALPHABET,
+                                           10);
     }
 
 public int getId() { 
@@ -86,7 +93,14 @@ public String toString() {
             '}';
 }
 
+public static void main(String[] args){
+    Lista l1 = new Lista ("compra", "lista de compras", LocalDate.of(2025, 12, 23) );
+    System.out.println(l1);
 
+}
+}
+
+/* 
     public byte[] toByteArray() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(baos);
@@ -113,4 +127,4 @@ public String toString() {
 
     }
 
-}
+}*/
