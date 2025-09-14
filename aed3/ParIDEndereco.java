@@ -34,7 +34,7 @@ public class ParIDEndereco implements aed3.RegistroHashExtensivel<ParIDEndereco>
         return this.id;
     }
 
-    public short size() {
+    public int size() {
         return this.TAMANHO;
     }
 

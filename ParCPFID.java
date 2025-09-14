@@ -38,7 +38,7 @@ public class ParCPFID implements aed3.RegistroHashExtensivel<ParCPFID> {
         return hash(this.cpf);
     }
 
-    public short size() {
+    public int size() {
         return this.TAMANHO;
     }
 

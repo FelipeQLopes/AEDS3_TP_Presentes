@@ -58,7 +58,11 @@ public class HashExtensivel<T extends RegistroHashExtensivel<T>> {
       quantidade = 0;
       quantidadeMaxima = (short) qtdmax;
       elementos = new ArrayList<>(quantidadeMaxima);
-      bytesPorElemento = ct.newInstance().size();
+      int tamanhoElem = ct.newInstance().size();
+      if (tamanhoElem > Short.MAX_VALUE)
+      throw new Exception("Elemento excede o tamanho máximo suportado.");
+      bytesPorElemento = (short) tamanhoElem;
+
       bytesPorCesto = (short) (bytesPorElemento * quantidadeMaxima + 3);
     }
 

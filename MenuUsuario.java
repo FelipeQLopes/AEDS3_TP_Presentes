@@ -155,7 +155,7 @@ public class MenuUsuario {
 
             switch (opcao) {
                 case 1:
-                    (new MenuLista(ID_GLOBAL, NOME_GLOBAL, CPF_GLOBAL)).menu();
+                    //(new MenuLista(ID_GLOBAL, NOME_GLOBAL, CPF_GLOBAL)).menu();
                     break;                
                 case 2:
                     //(new MenuProdutos(ID_GLOBAL, NOME_GLOBAL).menu())

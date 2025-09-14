@@ -1,118 +1,107 @@
 import java.time.LocalDate;
-
-import aed3.Registro;
+import java.io.*;
 
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
-import java.io.IOException;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-//implements Registo
-public class Lista {
+import aed3.Registro;
 
-    public int id;
-    public String nome;
-    public String descricao;
-    public String codigo;
-    public LocalDate dataCriacao;
-    public LocalDate dataLimite;
-    
+public class Lista implements Registro {
 
-    //N se torna necessário, n existe lista sem dados
-    /*public Lista() {
-        this(-1, "", "", LocalDate.now(), LocalDate.now().plusDays(7));
-    }*/
+    private int id;
+    private String nome;
+    private String descricao;
+    private String codigo;
+    private LocalDate dataCriacao;
+    private LocalDate dataLimite;
+    private int idUsuario; // vincula a lista a um usuário
 
-    public Lista(String n, String d, LocalDate d2) {
-        this(-1, n, d, d2);
-       
-    }
-
-    public Lista(int i, String n, String d, LocalDate d2) {
-        this.id = i;
-        this.nome = n;
-        this.descricao = d;
+    public Lista() {
+        this.id = -1;
+        this.idUsuario = -1;
         this.dataCriacao = LocalDate.now();
-        this.dataLimite = d2;
-        this.codigo=NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR,
-                                           NanoIdUtils.DEFAULT_ALPHABET,
-                                           10);
+        this.codigo = NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR,
+                                               NanoIdUtils.DEFAULT_ALPHABET,
+                                               10);
+        this.dataCriacao = LocalDate.now();
+        this.dataLimite = LocalDate.now();
     }
 
-public int getId() { 
-    return id; 
-}
-public void setId(int id) { 
-    this.id = id; 
-}
+    public Lista(String nome, String descricao, LocalDate dataLimite ) {
+        this.nome = nome;
+        this.descricao = descricao;
+        this.dataCriacao = LocalDate.now();
+        this.dataLimite = dataLimite;
+        this.codigo = NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR,
+                                               NanoIdUtils.DEFAULT_ALPHABET,
+                                               10);
+    }
+    public Lista(int id, String nome, String descricao, LocalDate dataLimite, int idUsuario) {
+        this.id = id;
+        this.nome = nome;
+        this.descricao = descricao;
+        this.dataCriacao = LocalDate.now();
+        this.dataLimite = dataLimite;
+        this.idUsuario = idUsuario;
+        this.codigo = NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR,
+                                               NanoIdUtils.DEFAULT_ALPHABET,
+                                               10);
+    }
+  
 
-public String getNome() { 
-    return nome; 
-}
-public void setNome(String nome) { 
-    this.nome = nome; 
-}
 
-public String getDescricao() { 
-    return descricao; 
-}
-public void setDescricao(String descricao) { 
-    this.descricao = descricao; 
-}
+    // Getters e setters
 
-public String getCodigo() { 
-    return codigo; 
-}
-public void setCodigo(String codigo) { 
-    this.codigo = codigo; 
-}
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
-public LocalDate getDataCriacao() { 
-    return dataCriacao; 
-}
-public void setDataCriacao(LocalDate dataCriacao) { 
-    this.dataCriacao = dataCriacao; 
-}
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
 
-public LocalDate getDataLimite() { 
-    return dataLimite; 
-}
-public void setDataLimite(LocalDate dataLimite) { 
-    this.dataLimite = dataLimite; 
-}
+    public String getDescricao() { return descricao; }
+    public void setDescricao(String descricao) { this.descricao = descricao; }
 
-public String toString() {
-    return "Lista{" +
-            "id=" + id +
-            ", nome='" + nome + '\'' +
-            ", descricao='" + descricao + '\'' +
-            ", codigo='" + codigo + '\'' +
-            ", dataCriacao=" + dataCriacao +
-            ", dataLimite=" + dataLimite +
-            '}';
-}
+    public String getCodigo() { return codigo; }
+    public void setCodigo(String codigo) { this.codigo = codigo; }
 
-public static void main(String[] args){
-    Lista l1 = new Lista ("compra", "lista de compras", LocalDate.of(2025, 12, 23) );
-    System.out.println(l1);
+    public LocalDate getDataCriacao() { return dataCriacao; }
+    public void setDataCriacao(LocalDate dataCriacao) { this.dataCriacao = dataCriacao; }
 
-}
-}
+    public LocalDate getDataLimite() { return dataLimite; }
+    public void setDataLimite(LocalDate dataLimite) { this.dataLimite = dataLimite; }
 
-/* 
+    public int getIdUsuario() { return idUsuario; }
+    public void setIdUsuario(int idUsuario) { this.idUsuario = idUsuario; }
+
+    @Override
+    public String toString() {
+        return "Lista{" +
+                "id=" + id +
+                ", nome='" + nome + '\'' +
+                ", descricao='" + descricao + '\'' +
+                ", codigo='" + codigo + '\'' +
+                ", dataCriacao=" + dataCriacao +
+                ", dataLimite=" + dataLimite +
+                ", idUsuario=" + idUsuario +
+                '}';
+    }
+
+    // Serialização para bytes (salvar em arquivo)
+
     public byte[] toByteArray() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(baos);
+
         dos.writeInt(this.id);
         dos.writeUTF(this.nome);
         dos.writeUTF(this.descricao);
         dos.writeUTF(this.codigo);
         dos.writeInt((int) this.dataCriacao.toEpochDay());
         dos.writeInt((int) this.dataLimite.toEpochDay());
+        dos.writeInt(this.idUsuario);
+
         return baos.toByteArray();
     }
 
+    // Desserialização de bytes (ler arquivo)
 
     public void fromByteArray(byte[] b) throws IOException {
         ByteArrayInputStream bais = new ByteArrayInputStream(b);
@@ -124,7 +113,6 @@ public static void main(String[] args){
         this.codigo = dis.readUTF();
         this.dataCriacao = LocalDate.ofEpochDay(dis.readInt());
         this.dataLimite = LocalDate.ofEpochDay(dis.readInt());
-
+        this.idUsuario = dis.readInt();
     }
-
-}*/
+}
