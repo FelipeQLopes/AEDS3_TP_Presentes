@@ -3,9 +3,9 @@ import java.util.Scanner;
 public class Principal {
 
     public static void main(String[] args) {
-   try {
-    ArquivoUsuario arqUsuarios = new ArquivoUsuario();
-    ArquivoLista arqListas = new ArquivoLista();
+        try {
+            ArquivoUsuario arqUsuarios = new ArquivoUsuario();
+            ArquivoLista arqListas = new ArquivoLista();
 
 
             Scanner console = new Scanner(System.in);

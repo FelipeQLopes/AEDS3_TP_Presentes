@@ -1,5 +1,5 @@
 {
   "java.project.referencedLibraries": [
-    "libs/**/*.jar"
+    "../libs/jnanoid-2.0.0.jar"
   ]
 }

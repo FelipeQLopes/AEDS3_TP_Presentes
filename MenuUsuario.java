@@ -134,43 +134,46 @@ public class MenuUsuario {
 
     //region menuLogado
     public void menuLogado(){
+        try {
+            int opcao;
+            do {
 
-        int opcao;
-        do {
+                System.out.println("\n\nPresenteFácil 1.0");
+                System.out.println("-----------------");
+                System.out.println("> Home");
+                System.out.println("\n1 - Listas");
+                System.out.println("2 - Produtos");
+                System.out.println("3 - Meus Dados");
+                System.out.println("0 - Logout");
 
-            System.out.println("\n\nPresenteFácil 1.0");
-            System.out.println("-----------------");
-            System.out.println("> Home");
-            System.out.println("\n1 - Listas");
-            System.out.println("2 - Produtos");
-            System.out.println("3 - Meus Dados");
-            System.out.println("0 - Logout");
+                System.out.print("\nOpção: ");
+                try {
+                    opcao = Integer.valueOf(console.nextLine());
+                } catch(NumberFormatException e) {
+                    opcao = -1;
+                }
+                switch (opcao) {
+                    case 1:
+                        (new MenuLista(ID_GLOBAL, NOME_GLOBAL, CPF_GLOBAL)).menu();
+                        break;                
+                    case 2:
+                        //(new MenuProdutos(ID_GLOBAL, NOME_GLOBAL).menu())
+                        break;
+                    case 3:
+                        meusDados();
+                        break;
+                    case 0:
+                        break;
+                    default:
+                        System.out.println("Opção inválida!");
+                        break;
+                }
 
-            System.out.print("\nOpção: ");
-            try {
-                opcao = Integer.valueOf(console.nextLine());
-            } catch(NumberFormatException e) {
-                opcao = -1;
-            }
-
-            switch (opcao) {
-                case 1:
-                    //(new MenuLista(ID_GLOBAL, NOME_GLOBAL, CPF_GLOBAL)).menu();
-                    break;                
-                case 2:
-                    //(new MenuProdutos(ID_GLOBAL, NOME_GLOBAL).menu())
-                    break;
-                case 3:
-                    meusDados();
-                    break;
-                case 0:
-                    break;
-                default:
-                    System.out.println("Opção inválida!");
-                    break;
-            }
-
-        } while (opcao != 0);
+            } while (opcao != 0);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     //endregion menuLogado
 
