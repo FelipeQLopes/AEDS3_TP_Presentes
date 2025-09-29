@@ -1,8 +1,2 @@
-mkdir -p bin
-javac -d bin -cp "libs/jnanoid-2.0.0.jar" $(find . -name "*.java")
-
-//executar em MacOS ou Linux
-java -cp "bin:libs/jnanoid-2.0.0.jar" Principal
-
-//executar em Windows
-java -cp "bin;libs/jnanoid-2.0.0.jar" Principal
+mvn clean compile
+mvn exec:java
