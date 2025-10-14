@@ -13,11 +13,14 @@ public class Principal {
 
             int opcao;
             do {
-                System.out.println("\n\nAEDsIII");
-                System.out.println("-------");
-                System.out.println("> Início");
-                System.out.println("\n1 - PresenteFácil 1.0");
-                System.out.println("0 - Sair");
+                System.out.println("\n\nPresenteFácil 1.0\n");
+                System.out.println("--------------\n");
+                System.out.println("> Início\n");
+                System.out.println("(1) Meus dados\n");
+                System.out.println("(2) Minhas Listas\n");
+                System.out.println("(3) Produtos\n");
+                System.out.println("(4) Buscar Lista\n\n");
+                System.out.println("(S) - Sair\n");
 
                 System.out.print("\nOpção: ");
                 try {

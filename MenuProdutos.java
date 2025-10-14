@@ -28,10 +28,8 @@ public class MenuProdutos {
                     crud.adicionarProduto(nome, gtin, desc);
                 }
                 
-                case 4 -> {
-                    System.out.print("Nome do produto a remover: ");
-                    String name = scanner.nextLine();
-                    crud.removerProduto(name);
+                case 'R' -> {
+                    
                 }
                 default -> System.out.println("Opção inválida!");
             }
