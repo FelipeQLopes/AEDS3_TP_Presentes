@@ -7,11 +7,14 @@ public class MenuProdutos {
         int opcao;
         //opções de cadastro do produto
         do {
-            System.out.println("\n=== CRUD de Produtos ===");
+            System.out.println("\n\nPresenteFácil 1.0");
+            System.out.println("-----------------");
+            System.out.println("> Início > Produtos\n");
+
             System.out.println("(1). Buscar produtos por GTIN");
             System.out.println("(2). Listar todos os produtos");
-            System.out.println("(3). Cadastrar um novo produto");
-            System.out.println("(R). Retornar ao menu anterior");
+            System.out.println("(3). Cadastrar um novo produto\n");
+            System.out.println("(R). Retornar ao menu anterior\n");
             System.out.print("Opção: ");
             opcao = scanner.nextInt();
             scanner.nextLine(); 

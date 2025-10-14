@@ -13,14 +13,14 @@ public class Principal {
 
             int opcao;
             do {
-                System.out.println("\n\nPresenteFácil 1.0\n");
-                System.out.println("--------------\n");
+                System.out.println("\n\nPresenteFácil 1.0");
+                System.out.println("-----------------\n");
                 System.out.println("> Início\n");
-                System.out.println("(1) Meus dados\n");
-                System.out.println("(2) Minhas Listas\n");
-                System.out.println("(3) Produtos\n");
-                System.out.println("(4) Buscar Lista\n\n");
-                System.out.println("(S) - Sair\n");
+                System.out.println("(1) Meus dados");
+                System.out.println("(2) Minhas Listas");
+                System.out.println("(3) Produtos");
+                System.out.println("(4) Buscar Lista\n");
+                System.out.println("(S) - Sair");
 
                 System.out.print("\nOpção: ");
                 try {
@@ -33,6 +33,8 @@ public class Principal {
                     case 1:
                         (new MenuUsuario()).menu();
                         break;
+                    case 3:
+                        MenuProdutos.main(null);
                     case 0:
                         break;
                     default:

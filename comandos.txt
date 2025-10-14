@@ -1,3 +1,10 @@
 mkdir -p bin
-javac -d bin -cp "libs/jnanoid-2.0.0.jar" $(find . -name "*.java")
-java -cp "bin:libs/jnanoid-2.0.0.jar" Principal
+
+
+Para compilar o programa use:
+
+javac -cp "libs/*;." Principal.java
+java -cp "libs/*;." Principal.java 
+
+/* Isso vai gerar os .class de todos os arquivos, se for modificar e commitar, apague os .class.
+Comando del *.class, ou se tiver .class dentro de outras pastas como aed3, vá até a pasta, cd aed3, e depois dê o del *.class
