@@ -14,27 +14,33 @@ public class MenuLista {
     private ArvoreBMais<ParIntInt> relacaoUsuarioLista;
     private Scanner console;
 
-    public MenuLista(int ID_GLOBAL, String NOME_GLOBAL, String CPF_GLOBAL) throws Exception {
-        this.ID_GLOBAL = ID_GLOBAL;
-        this.NOME_GLOBAL = NOME_GLOBAL;
-        this.CPF_GLOBAL = CPF_GLOBAL;
+   public MenuLista(int ID_GLOBAL, String NOME_GLOBAL, String CPF_GLOBAL) throws Exception {
+    this.ID_GLOBAL = ID_GLOBAL;
+    this.NOME_GLOBAL = NOME_GLOBAL;
+    this.CPF_GLOBAL = CPF_GLOBAL;
 
-        this.arqListas = new ArquivoLista();
+    this.arqListas = new ArquivoLista();
+    this.relacaoUsuarioLista = new ArvoreBMais<>(
+        ParIntInt.class.getConstructor(),
+        "dados/relacoesUsuarioLista.db"
+    );
 
-        this.console = new Scanner(System.in);
-    }
+    this.console = new Scanner(System.in);
+}
 
+
+    
     public void menu() {
         int opcao;
 
         do {
             System.out.println("\n\nPresenteFácil 1.0");
             System.out.println("-----------------");
-            System.out.println("> Home > Listas");
-            System.out.println("\n1 - Minhas Listas");
-            System.out.println("2 - Buscar Listas");
-            System.out.println("3 - Criar nova Lista");
-            System.out.println("0 - Voltar");
+            System.out.println("> Início > Listas\n");
+            System.out.println("(1) - Minhas Listas");
+            System.out.println("(2) - Buscar Listas");
+            System.out.println("(3) - Criar nova Lista\n");
+            System.out.println("(R) - Retornar ao menu anterior");
 
             System.out.print("\nOpção: ");
             try {
@@ -54,10 +60,10 @@ public class MenuLista {
                     criarLista();
                     break;
                 case 0:
-                    System.out.println("Voltando...");
+                    System.out.println("Voltando...\n");
                     break;
                 default:
-                    System.out.println("Opção inválida!");
+                    System.out.println("Opção inválida!\n");
                     break;
             }
 
@@ -88,44 +94,79 @@ public class MenuLista {
     }
 
     public void criarLista() {
-        if (ID_GLOBAL == -1) {
-            System.out.println("Você precisa estar logado para criar uma lista.");
-            return;
-        }
-
-        try {
-            System.out.print("Digite o nome da nova lista: ");
-            String nomeLista = console.nextLine();
-
-            System.out.print("Digite a descrição da lista: ");
-            String descricaoLista = console.nextLine();
-
-            System.out.print("Digite a data limite (YYYY-MM-DD): ");
-            String dataLimiteStr = console.nextLine();
-            LocalDate dataLimite = LocalDate.parse(dataLimiteStr);
-
-            Lista novaLista = new Lista();
-            novaLista.setNome(nomeLista);
-            novaLista.setDescricao(descricaoLista);
-            novaLista.setDataLimite(dataLimite);
-            novaLista.setIdUsuario(ID_GLOBAL);
-
-            int idLista = arqListas.create(novaLista);
-
-            // Relacionar usuário com a lista criada na árvore
-            relacaoUsuarioLista.create(new ParIntInt(ID_GLOBAL, idLista));
-
-            System.out.println("Lista criada com sucesso! ID: " + idLista);
-
-        } catch (Exception e) {
-            System.out.println("Erro ao criar lista: " + e.getMessage());
-        }
+    if (ID_GLOBAL == -1) {
+        System.out.println("Você precisa estar logado para criar uma lista.");
+        return;
     }
+
+    try {
+        System.out.print("Digite o nome da nova lista: ");
+        String nomeLista = console.nextLine();
+
+        System.out.print("Digite a descrição da lista: ");
+        String descricaoLista = console.nextLine();
+
+        System.out.print("Digite a data limite (YYYY-MM-DD): ");
+        String dataLimiteStr = console.nextLine();
+        LocalDate dataLimite = LocalDate.parse(dataLimiteStr);
+
+        Lista novaLista = new Lista();
+        novaLista.setNome(nomeLista);
+        novaLista.setDescricao(descricaoLista);
+        novaLista.setDataLimite(dataLimite);
+        novaLista.setIdUsuario(ID_GLOBAL);
+
+        // Verificações antes de persistir
+        if (arqListas == null) {
+            throw new IllegalStateException("arqListas não inicializado");
+        }
+        if (relacaoUsuarioLista == null) {
+            throw new IllegalStateException("relacaoUsuarioLista não inicializado");
+        }
+
+        int idLista = arqListas.create(novaLista);
+
+        if (idLista < 0) {
+            System.out.println("arqListas.create retornou id inválido: " + idLista);
+        } else {
+            try {
+                relacaoUsuarioLista.create(new ParIntInt(ID_GLOBAL, idLista));
+            } catch (Exception e) {
+                System.out.println("Erro ao relacionar usuário-lista:");
+                e.printStackTrace();
+            }
+            System.out.println("Lista criada com sucesso! ID: " + idLista);
+        }
+
+    } catch (Exception e) {
+        System.out.println("Erro ao criar lista: " + e.getClass().getName() + " - " + e.getMessage());
+        e.printStackTrace(); // mostra linha exata do erro
+    }
+}
+
 
 
     //Inserção manual de uma lista!!!
-    /*
+    
     public static void main(String[] args) {
+        
+    try {
+        // Simula um usuário logado (pode mudar depois se quiser)
+        int idUsuario = 1;
+        String nomeUsuario = "Usuário Teste";
+        String cpfUsuario = "000.000.000-00";
+
+        // Instancia a classe e chama o menu
+        MenuLista menu = new MenuLista(idUsuario, nomeUsuario, cpfUsuario);
+        menu.menu();
+
+    } catch (Exception e) {
+        System.out.println("Erro ao iniciar o menu: " + e.getMessage());
+        e.printStackTrace();
+    }
+}
+
+        /*
         try {
             // Simula que um usuário com ID 1 está logado
             int usuarioLogadoId = 1;
@@ -155,7 +196,8 @@ public class MenuLista {
 
         } catch (Exception e) {
             System.out.println("Erro ao criar lista:");
-            e.printStackTrace();
-        }
-    } */
-}
+            e.printStackTrace();*/
+
+          
+    } 
+

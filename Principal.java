@@ -33,6 +33,8 @@ public class Principal {
                     case 1:
                         (new MenuUsuario()).menu();
                         break;
+                    case 2:
+                        MenuLista.main(null);
                     case 3:
                         MenuProdutos.main(null);
                     case 0:
