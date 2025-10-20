@@ -27,6 +27,19 @@ public class ProdutoCRUD {
         }
     }
 
+    public void buscaGtin(String valor){
+        if (produtos.isEmpty()) {
+            System.out.println("Nenhum produto cadastrado.");
+        } else {
+             for (Produto p : produtos) {
+        if (p.getGtin13().equals(valor)) {
+            System.out.println("Produto encontrado: " + p.getNome());
+
+        }
+        }
+    }
+
+}
     // Deletar
     public void removerProduto(String nome) {
         produtos.removeIf(p -> p.getNome().equals(nome));
