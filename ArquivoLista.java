@@ -2,6 +2,8 @@ import aed3.*;
 import java.util.*;
 
 public class ArquivoLista extends Arquivo<Lista> {
+        private String nome;
+
 
     HashExtensivel<ParCodigoID> indiceIndiretoCodigo;
 
@@ -27,6 +29,9 @@ public class ArquivoLista extends Arquivo<Lista> {
         if(pci == null)
             return null;
         return read(pci.getId());
+    }
+     public String getNomeLista() {
+        return nome;
     }
 
     @Override

@@ -21,8 +21,10 @@ public class ProdutoCRUD {
         if (produtos.isEmpty()) {
             System.out.println("Nenhum produto cadastrado.");
         } else {
+            int x=1;
             for (Produto p : produtos) {
-                System.out.println(p.getNome());
+                System.out.println("(" + x + ") " + p.getNome());
+                x++;
             }
         }
     }

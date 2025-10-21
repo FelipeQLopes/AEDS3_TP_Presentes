@@ -78,47 +78,50 @@ public class MenuLista {
     }
 
     public void minhasListas() {
+
+        //Não mostra o nome da lista..
         
-        List<Integer> ids = cacheRelacao.getOrDefault(ID_GLOBAL, Collections.emptyList());
+    List<Integer> ids = cacheRelacao.getOrDefault(ID_GLOBAL, Collections.emptyList());
 
-        if (ids.isEmpty()) {
-            System.out.println("Nenhuma lista encontrada para o usuário " + ID_GLOBAL + ".");
-            return;
-        }
-
-        System.out.println("\nListas do usuário (ID usuário = " + ID_GLOBAL + "):");
-
-        if (arqListas != null) {
-            for (Integer idLista : ids) {
-                try {
-                  
-                    Lista lista = null;
-
-                    try {
-                        lista = arqListas.read(idLista); 
-                    } catch (NoSuchMethodError | AbstractMethodError ex) {
-                        lista = null;
-                    } catch (Exception ex) {
-                        lista = null;
-                    }
-
-                    if (lista != null) {
-                        System.out.println(lista);
-                    } else {
-                        System.out.println("ID lista: " + idLista );
-                    }
-                } catch (Exception e) {
-                    System.out.println("Erro ao recuperar lista ID " + idLista + ": " + e.getMessage());
-                }
-            }
-        } else {
-            for (Integer idLista : ids) {
-                System.out.println("ID lista: " + idLista );
-            }
-        }
+    if (ids.isEmpty()) {
+        System.out.println("Nenhuma lista encontrada para o usuário " + ID_GLOBAL + ".");
+        return;
     }
 
-   
+    System.out.println("\nListas do usuário (ID usuário = " + ID_GLOBAL + "):");
+
+    if (arqListas != null) {
+        for (Integer idLista : ids) {
+            try {
+              
+                Lista lista = null;
+
+                try {
+                    lista = arqListas.read(idLista); 
+                } catch (NoSuchMethodError | AbstractMethodError ex) {
+                    lista = null;
+                } catch (Exception ex) {
+                    lista = null;
+                }
+
+                if (lista != null) {
+                   
+                    String nomeLista = lista.getNome(); 
+                    System.out.println("ID lista: " + idLista + " | Nome: " + nomeLista);
+                } else {
+                    System.out.println("ID lista: " + idLista + " (Nome não encontrado)");
+                }
+            } catch (Exception e) {
+                System.out.println("Erro ao recuperar lista ID " + idLista + ": " + e.getMessage());
+            }
+        }
+    } else {
+        for (Integer idLista : ids) {
+            System.out.println("ID lista: " + idLista );
+        }
+    }
+}
+
 
     public void buscarListas() {
        //falta implementar
