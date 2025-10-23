@@ -11,13 +11,13 @@ public class MenuLista {
     private String NOME_GLOBAL;
     private String CPF_GLOBAL;
 
-    private ArquivoLista arqListas; 
+    private ArquivoLista arqListas;
     private ArvoreBMais<ParIntInt> relacaoUsuarioLista;
     private Scanner console;
 
     private Map<Integer, List<Integer>> cacheRelacao = new HashMap<>();
 
-    // Gerador de IDs automático
+    // Geracao de id automtico
     private AtomicInteger nextId = new AtomicInteger(1);
 
     public MenuLista(int ID_GLOBAL, String NOME_GLOBAL, String CPF_GLOBAL) throws Exception {
@@ -25,13 +25,14 @@ public class MenuLista {
         this.NOME_GLOBAL = NOME_GLOBAL;
         this.CPF_GLOBAL = CPF_GLOBAL;
 
+        this.arqListas = new ArquivoLista();
+
         this.relacaoUsuarioLista = new ArvoreBMais<>(
             ParIntInt.class.getConstructor(),
             "dados/relacoesUsuarioLista.db"
         );
 
         this.console = new Scanner(System.in);
-
     }
 
     public void menu() {
@@ -49,17 +50,16 @@ public class MenuLista {
             System.out.print("\nOpção: ");
             try {
                 opcao = console.nextLine().trim().toUpperCase();
-                
             } catch (NumberFormatException e) {
                 opcao = "-1";
             }
 
             switch (opcao) {
                 case "1":
-                    minhasListas(); 
+                    minhasListas();
                     break;
                 case "2":
-                    buscarListas(); 
+                    buscarListas();
                     break;
                 case "3":
                     criarLista();
@@ -68,65 +68,73 @@ public class MenuLista {
                     Principal.main(new String[0]);
                     System.out.println("Voltando...\n");
                     break;
-
                 default:
                     System.out.println("Opção inválida!\n");
                     break;
             }
 
-        } while (opcao != "0");
+        } while (!opcao.equals("0"));
     }
 
     public void minhasListas() {
 
-        //Não mostra o nome da lista..
-        
-    List<Integer> ids = cacheRelacao.getOrDefault(ID_GLOBAL, Collections.emptyList());
+        List<Integer> ids = cacheRelacao.getOrDefault(ID_GLOBAL, Collections.emptyList());
 
-    if (ids.isEmpty()) {
-        System.out.println("Nenhuma lista encontrada para o usuário " + ID_GLOBAL + ".");
-        return;
-    }
+        if (ids.isEmpty()) {
+            System.out.println("Nenhuma lista encontrada.");
+            return;
+        }
 
-    System.out.println("\nListas do usuário (ID usuário = " + ID_GLOBAL + "):");
+        System.out.println("\nListas do usuário " + NOME_GLOBAL + ":");
 
-    if (arqListas != null) {
-        for (Integer idLista : ids) {
-            try {
-              
-                Lista lista = null;
-
+        if (arqListas != null) {
+            for (Integer idLista : ids) {
                 try {
-                    lista = arqListas.read(idLista); 
-                } catch (NoSuchMethodError | AbstractMethodError ex) {
-                    lista = null;
-                } catch (Exception ex) {
-                    lista = null;
-                }
+                    Lista lista = null;
 
-                if (lista != null) {
-                   
-                    String nomeLista = lista.getNome(); 
-                    System.out.println("ID lista: " + idLista + " | Nome: " + nomeLista);
-                } else {
-                    System.out.println("ID lista: " + idLista + " (Nome não encontrado)");
+                    try {
+                        lista = arqListas.read(idLista);
+                    } catch (NoSuchMethodError | AbstractMethodError ex) {
+                        lista = null;
+                    } catch (Exception ex) {
+                        lista = null;
+                    }
+
+                    if (lista != null) {
+                        String nomeLista = lista.getNome();
+                        String codigoNanoId = lista.getCodigo(); //NANOID
+                        System.out.println(
+                                " Nome: " + nomeLista +
+                                " | Código: " + codigoNanoId);
+                    } else {
+                        System.out.println("ID lista: " + idLista + " (Nome não encontrado)");
+                    }
+                } catch (Exception e) {
+                    System.out.println("Erro ao recuperar lista ID " + idLista + ": " + e.getMessage());
                 }
-            } catch (Exception e) {
-                System.out.println("Erro ao recuperar lista ID " + idLista + ": " + e.getMessage());
+            }
+        } else {
+            for (Integer idLista : ids) {
+                System.out.println("ID lista: " + idLista);
             }
         }
-    } else {
-        for (Integer idLista : ids) {
-            System.out.println("ID lista: " + idLista );
-        }
     }
-}
-
 
     public void buscarListas() {
-       //falta implementar
-    }
+        System.out.print("Digite o código da lista para buscar: ");
+        String codigo = console.nextLine();
 
+        try {
+            Lista lista = arqListas.read(codigo);
+            if (lista != null) {
+                System.out.println(lista);
+            } else {
+                System.out.println("Lista não encontrada.");
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao buscar lista: " + e.getMessage());
+        }
+    }
 
     public void criarLista() {
         if (ID_GLOBAL == -1) {
@@ -158,12 +166,12 @@ public class MenuLista {
                     novaLista.setIdUsuario(ID_GLOBAL);
 
                     arqListas.create(novaLista);
+                    System.out.println("Código gerado (NanoID): " + novaLista.getCodigo());
                 } catch (Exception e) {
-                    System.out.println("Aviso: Não foi possível gravar no ArquivoLista: " + e.getMessage());
                 }
             }
 
-            // Inserção da nova lusta na árvore B+
+            // Inserção da nova lista na árvore B+
             try {
                 relacaoUsuarioLista.create(new ParIntInt(ID_GLOBAL, idLista));
             } catch (Exception e) {
@@ -174,7 +182,7 @@ public class MenuLista {
 
             cacheRelacao.computeIfAbsent(ID_GLOBAL, k -> new ArrayList<>()).add(idLista);
 
-            System.out.println("Lista criada com sucesso! ID automático: " + idLista);
+            System.out.println("Lista criada com sucesso!");
 
         } catch (Exception e) {
             System.out.println("Erro ao criar lista: " + e.getClass().getName() + " - " + e.getMessage());
@@ -188,10 +196,9 @@ public class MenuLista {
         try {
             // Simula um usuário apenas para fins de testes
             int idUsuario = 1;
-            String nomeUsuario = "Usuário Teste";
+            String nomeUsuario = "Marcos";
             String cpfUsuario = "000.000.000-00";
 
-           
             MenuLista menu = new MenuLista(idUsuario, nomeUsuario, cpfUsuario);
             menu.menu();
 

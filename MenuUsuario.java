@@ -84,7 +84,7 @@ public class MenuUsuario {
     //endregion menu
 
     //region login
-    public void login(){
+    public int login(){
         String cpf;
         String senha;
         String hashSenha;
@@ -96,7 +96,7 @@ public class MenuUsuario {
             cpf = console.nextLine();  // Lê o CPF digitado pelo usuário
 
             if(cpf.isEmpty())
-                return; 
+                return -1; 
 
             // Validação do CPF (11 dígitos e composto apenas por números)
             if (cpf.length() == 11 && cpf.matches("\\d{11}")) {
@@ -117,7 +117,7 @@ public class MenuUsuario {
                     ID_GLOBAL = usuario.getId();
                     NOME_GLOBAL = usuario.nome;
                     CPF_GLOBAL = usuario.cpf;
-                    menuLogado();
+                    Principal.main(new String[0]);
                 }else{
                     System.out.println("Erro no Sistema. O CPF ou a Senha estão incorretos");
                 }
@@ -128,6 +128,8 @@ public class MenuUsuario {
             System.out.println("Erro no Sistema. O CPF ou a Senha estão incorretos");
             e.printStackTrace();
         }
+
+        return -1;
 
     }
     //endregion login
@@ -254,19 +256,19 @@ public class MenuUsuario {
                 System.err.println("A senha tem que ter no mínimo 6 dígitos");
         } while(hashSenha.length() < 6);
         
-        do {
+       // do {
             System.out.print("Pergunta Secreta: ");
-            perguntaSecreta = console.nextLine();
+            perguntaSecreta = console.nextLine();/* 
             if(perguntaSecreta.length()<10 || !(perguntaSecreta.contains("?")))
                 System.err.println("Escreva uma pergunta váilida com ? e mais de 10 caracteres.");
-        } while(perguntaSecreta.length()<10 || !(perguntaSecreta.contains("?")));
+        } while(perguntaSecreta.length()<10 || !(perguntaSecreta.contains("?")));*/
         
-        do {
+        //do {
             System.out.print("Resposta Secreta: ");
-            respostaSecreta = console.nextLine();
+            respostaSecreta = console.nextLine();/* 
             if(respostaSecreta.length()<10)
                 System.err.println("Escreva uma pergunta váilida com ? e mais de 10 caracteres.");
-        } while(respostaSecreta.length()<10);
+        } while(respostaSecreta.length()<10);*/
 
         do {
             System.out.print("Data de nascimento (DD/MM/AAAA): ");

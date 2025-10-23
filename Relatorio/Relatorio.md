@@ -17,6 +17,7 @@ Funcionalidades principais feitas:
 - Grande parte da classe lista feita
 - Hash Extensível implementada
 - Arvore B+ implementada
+- 
 
 
 ---
@@ -42,6 +43,13 @@ A seguir estão algumas telas do sistema para facilitar a correção:
 ### Visualização do Código das Listas
 ![Codigo das Listas](imagens/CodigoLista.png)
 
+### Visualização do Código dos Produtos
+![Codigo dos Produtos](imagens/CodigoProduto.png)
+
+### Visualização do Cadastro de Produtos
+![Cadastro de Produtos](imagens/CadastroProdutos.png)
+
+
 ---
 
 ## Estrutura de Classes
@@ -56,6 +64,10 @@ As principais classes são:
 - aed3/HashExtensivel — Implementa a tabela hash extensível para índices diretos.
 - aed3/ArvoreBMais — Implementa a Árvore B+ para índices indiretos e relacionamento 1:N.
 - aed3/Arquivo — Classe base para operações de persistência em disco.
+- Produto - Código da classe produto
+- ProdutoCRUD - Código que possuí o CRUD da classe Produto
+- ListaProduto - Gerencia a Relação da lista com os produtos
+- Menu Produto - Gerencia as funções do menu de produtos
 
 ---
 
