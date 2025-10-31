@@ -3,7 +3,8 @@ package tp.presentes;
 import tp.presentes.aed3.*;
 
 import java.time.LocalDate;
-import java.util.Scanner;
+import java.util.*;
+
 
 public class MenuLista {
 
@@ -21,7 +22,7 @@ public class MenuLista {
         this.CPF_GLOBAL = CPF_GLOBAL;
 
         this.arqListas = new ArquivoLista();
-        this.relacaoUsuarioLista = new ArvoreBMais<>(ParIntInt.class.getConstructor(), "./src/main/resources/dados/listas/listas.db");
+        this.relacaoUsuarioLista = new ArvoreBMais<>(ParIntInt.class.getConstructor(), 5, "./src/main/resources/dados/relacaoUsuarioLista.db");
 
         this.console = new Scanner(System.in);
     }
@@ -69,7 +70,6 @@ public class MenuLista {
     public void minhasListas() {
   
         
-
     }
 
 
@@ -115,6 +115,7 @@ public class MenuLista {
             int idLista = arqListas.create(novaLista);
 
             // Relacionar usuário com a lista criada na árvore
+            System.out.println(idLista + " " + ID_GLOBAL);
             relacaoUsuarioLista.create(new ParIntInt(ID_GLOBAL, idLista));
 
             System.out.println("Lista criada com sucesso! ID: " + idLista);
@@ -127,39 +128,4 @@ public class MenuLista {
     }
 
 
-    //Inserção manual de uma lista!!!
-    /*
-    public static void main(String[] args) {
-        try {
-            // Simula que um usuário com ID 1 está logado
-            int usuarioLogadoId = 1;
-
-            // Inicializa os arquivos
-            ArquivoLista arqLista = new ArquivoLista();
-            ArvoreBMais<ParIntInt> relacaoUsuarioLista = new ArvoreBMais<>(
-                ParIntInt.class.getConstructor(),
-                "dados/relacoesUsuarioLista.db"
-            );
-
-            // Cria nova lista manualmente
-            Lista novaLista = new Lista("Compra", "Compra no marketing",
-                                        LocalDate.of(2025, 12, 10));
-            novaLista.setIdUsuario(usuarioLogadoId);  // Garanta que esse campo exista na sua classe Lista
-
-            // Grava a lista
-            int idLista = arqLista.create(novaLista);
-
-            // Relaciona usuário com lista
-            relacaoUsuarioLista.create(new ParIntInt(usuarioLogadoId, idLista));
-
-            // Confirma no console
-            System.out.println("Lista criada com sucesso!");
-            System.out.println("ID da Lista: " + idLista);
-            System.out.println("Relacionamento salvo na árvore B+");
-
-        } catch (Exception e) {
-            System.out.println("Erro ao criar lista:");
-            e.printStackTrace();
-        }
-    } */
-}
+    }
