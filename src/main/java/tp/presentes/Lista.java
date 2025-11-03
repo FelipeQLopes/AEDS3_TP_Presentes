@@ -53,15 +53,12 @@ public class Lista implements Registro {
 
     @Override
     public String toString() {
-        return "Lista{" +
-                "id=" + id +
-                ", nome='" + nome + '\'' +
-                ", descricao='" + descricao + '\'' +
-                ", codigo='" + codigo + '\'' +
-                ", dataCriacao=" + dataCriacao +
-                ", dataLimite=" + dataLimite +
-                ", idUsuario=" + idUsuario +
-                '}';
+        return
+            "Código: " + this.getCodigo()
+            +"\nNome: " + this.getNome()
+            +"\nDescrição: " + this.getDescricao()
+            +"\nData de Criação: " + this.getDataCriacao()
+            +"\nData Limite: " + this.getDataLimite();
     }
 
     // Serialização para bytes (salvar em arquivo)

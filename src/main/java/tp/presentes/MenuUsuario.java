@@ -158,7 +158,7 @@ public class MenuUsuario {
                         (new MenuLista(ID_GLOBAL, NOME_GLOBAL, CPF_GLOBAL)).menu();
                         break;                
                     case 2:
-                        //(new MenuProdutos(ID_GLOBAL, NOME_GLOBAL).menu())
+                        (new MenuProduto(ID_GLOBAL, NOME_GLOBAL, CPF_GLOBAL)).menu();
                         break;
                     case 3:
                         meusDados();
