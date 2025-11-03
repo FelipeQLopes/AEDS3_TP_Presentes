@@ -53,13 +53,13 @@ public class MenuProduto {
 
             switch (opcao) {
                 case 1:
-                    
+                    buscarProdutoPorGtin();
                     break;                
                 case 2:
-                    
+                    //listarProdutosPaginado();
                     break;
                 case 3:
-                    
+                    cadastrarProduto();
                     break;
                 case 0:
                     break;
@@ -73,6 +73,110 @@ public class MenuProduto {
         return;
     }
     //endregion menu
+
+    private void buscarProdutoPorGtin() {
+    System.out.print("Digite o GTIN-13: ");
+    String gtin = console.nextLine().trim();
+    try {
+        Produto p = arqProdutos.read(gtin);
+        if (p != null) {
+            System.out.println("\nProduto encontrado:\n" + p.toString());
+            mostrarProdutoDetalhes(p);
+        } else {
+            System.out.println("Produto não encontrado.");
+        }
+    } catch (Exception e) {
+        System.out.println("Erro ao buscar produto: " + e.getMessage());
+    }
+}
+
+
+/*
+private void listarProdutosPaginado() {
+    
+}
+*/
+
+private void cadastrarProduto() {
+    try {
+        System.out.print("Nome: ");
+        String nome = console.nextLine().trim();
+        System.out.print("Descrição: ");
+        String descricao = console.nextLine().trim();
+        System.out.print("GTIN-13 (13 dígitos): ");
+        String gtin = console.nextLine().trim();
+        if (!gtin.matches("\\d{13}")) {
+            System.out.println("GTIN inválido. Deve ter 13 dígitos numéricos.");
+            return;
+        }
+        // checar duplicidade
+        Produto existente = arqProdutos.read(gtin);
+        if (existente != null) {
+            System.out.println("Já existe um produto com esse GTIN: " + existente.getNome());
+            return;
+        }
+        Produto p = new Produto(nome, gtin, descricao);
+        int id = arqProdutos.create(p);
+        System.out.println("Produto cadastrado com ID: " + id);
+    } catch (Exception e) {
+        System.out.println("Erro ao cadastrar produto: " + e.getMessage());
+    }
+}
+
+private void mostrarProdutoDetalhes(Produto p) {
+    System.out.println("\n" + p.toString());
+    // mostrar em quais listas aparece
+    try {
+        ParIntInt parPesquisa = new ParIntInt(p.getId(), -1);
+        ArrayList<ParIntInt> rels = relacaoProdutoLista.read(parPesquisa);
+        ArrayList<String> minhas = new ArrayList<>();
+        int outras = 0;
+        for (ParIntInt par : rels) {
+            int idLista = par.getNum2(); // se o par trabalha (produto, idLista) ou vice-versa: ajustar conforme seu uso
+            Lista l = new ArquivoLista().read(idLista);
+            if (l.getIdUsuario() == ID_GLOBAL) minhas.add(l.getNome());
+            else outras++;
+        }
+        if (!minhas.isEmpty()) {
+            System.out.println("\nAparece nas minhas listas:");
+            minhas.sort(String::compareToIgnoreCase);
+            for (String s : minhas) System.out.println("- " + s);
+        }
+        System.out.println("\nAparece também em mais " + outras + " listas de outras pessoas.");
+    } catch (Exception e) {
+        // se erro, só ignora
+    }
+
+    System.out.println("\n(1) Alterar os dados do produto\n(2) Inativar o produto\n(R) Retornar");
+    System.out.print("Opção: ");
+    String op = console.nextLine().trim();
+    if (op.equals("1")) {
+        alterarProduto(p);
+    } else if (op.equals("2")) {
+        inativarProduto(p);
+    }
+}
+
+private void alterarProduto(Produto p) {
+    try {
+        System.out.print("Novo nome (enter para manter): ");
+        String nome = console.nextLine().trim();
+        if (!nome.isEmpty()) p.setNome(nome);
+        System.out.print("Nova descrição (enter para manter): ");
+        String desc = console.nextLine().trim();
+        if (!desc.isEmpty()) p.setDescricao(desc);
+        boolean ok = arqProdutos.update(p);
+        if (ok) System.out.println("Produto alterado com sucesso.");
+        else System.out.println("Falha ao alterar produto.");
+    } catch (Exception e) {
+        System.out.println("Erro: " + e.getMessage());
+    }
+}
+
+private void inativarProduto(Produto p) {
+   
+}
+
 
     public ArrayList<Produto> mostrarProdutos(Lista lista){
 

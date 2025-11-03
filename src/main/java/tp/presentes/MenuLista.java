@@ -235,7 +235,7 @@ public class MenuLista {
 
             switch(opcao){
                 case 1:
-                    gerenciarProdutos();
+                    gerenciarProdutos(lista);
                     break;
                 case 2:
                     alterarDados();
@@ -273,6 +273,7 @@ public class MenuLista {
             } catch (NumberFormatException e) {
                 opcao = -1;
             }
+    }while (opcao != 0);
     }
 
     public void buscarListas() {
