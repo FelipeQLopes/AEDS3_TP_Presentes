@@ -1,6 +1,8 @@
 package tp.presentes;
 
 import tp.presentes.aed3.*;
+import java.util.ArrayList;
+
 
 public class ArquivoProduto extends Arquivo<Produto> {
 
@@ -61,4 +63,24 @@ public class ArquivoProduto extends Arquivo<Produto> {
         }
         return false;
     }
+
+    public ArrayList<Produto> listAll() throws Exception {
+        ArrayList<Produto> lista = new ArrayList<>();
+
+        int id = 1;
+        Produto p;
+        while (true) {
+            p = super.read(id);
+            if (p == null)
+                break;
+            if (p.isAtivo())
+                lista.add(p);
+            id++;
+        }
+
+        return lista;
+    }
+
+
+
 }

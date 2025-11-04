@@ -3,6 +3,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.Comparator;
+import java.util.Collections;
 
 import tp.presentes.aed3.ArvoreBMais;
 
@@ -56,7 +58,7 @@ public class MenuProduto {
                     buscarProdutoPorGtin();
                     break;                
                 case 2:
-                    //listarProdutosPaginado();
+                    listarProdutosPaginado();
                     break;
                 case 3:
                     cadastrarProduto();
@@ -91,11 +93,47 @@ public class MenuProduto {
 }
 
 
-/*
 private void listarProdutosPaginado() {
-    
+    try {
+        ArrayList<Produto> todos = arqProdutos.listAll(); 
+        todos.sort((a,b) -> a.getNome().compareToIgnoreCase(b.getNome()));
+        int pageSize = 10;
+        int total = todos.size();
+        int totalPages = Math.max(1, (total + pageSize - 1) / pageSize);
+        int page = 1;
+        while (true) {
+            int start = (page - 1) * pageSize;
+            int end = Math.min(start + pageSize, total);
+            System.out.printf("\nPresenteFácil 1.0\n-----------------\n> Início > Produtos > Listagem\n\nPágina %d de %d\n\n", page, totalPages);
+            for (int i = start; i < end; i++) {
+                Produto p = todos.get(i);
+                System.out.printf("(%d) %s\n", (i - start) + 1, p.getNome());
+            }
+            System.out.println("\n(A) Página anterior  (P) Próxima página  (R) Retornar");
+            System.out.print("Opção: ");
+            String opt = console.nextLine().trim();
+            if (opt.equalsIgnoreCase("A") && page > 1) page--;
+            else if (opt.equalsIgnoreCase("P") && page < totalPages) page++;
+            else if (opt.equalsIgnoreCase("R")) break;
+            else {
+                // escolher produto por número da página
+                try {
+                    int escolha = Integer.parseInt(opt);
+                    if (escolha >= 1 && escolha <= (end - start)) {
+                        Produto escolhido = todos.get(start + escolha - 1);
+                        mostrarProdutoDetalhes(escolhido);
+                    } else {
+                        System.out.println("Opção inválida.");
+                    }
+                } catch (NumberFormatException ex) {
+                    System.out.println("Opção inválida.");
+                }
+            }
+        }
+    } catch (Exception e) {
+        System.out.println("Erro ao listar produtos: " + e.getMessage());
+    }
 }
-*/
 
 private void cadastrarProduto() {
     try {
@@ -174,35 +212,45 @@ private void alterarProduto(Produto p) {
 }
 
 private void inativarProduto(Produto p) {
-   
+    try {
+        p.setAtivo(false);
+        if (arqProdutos.update(p)) {
+            System.out.println("Produto inativado com sucesso.");
+        } else {
+            System.out.println("Falha ao inativar produto.");
+        }
+    } catch (Exception e) {
+        System.out.println("Erro ao inativar produto: " + e.getMessage());
+    }
+}
+
+public ArrayList<Produto> mostrarProdutos(Lista lista){
+
+    ParIntInt parPesquisa = new ParIntInt(lista.getId(), -1);
+    ArrayList<Produto> listaProdutosLista = new ArrayList<>();
+    int contador = 1;
+    try {
+        ArrayList<ParIntInt> listaProdutos = relacaoListaProduto.read(parPesquisa);
+
+        System.out.println("Produtos:\n");
+        for (ParIntInt par : listaProdutos) {
+            int idLista = par.getNum1();
+            int idProduto = par.getNum2();
+            if (idLista == lista.getId()) {
+                Produto produto = arqProdutos.read(idProduto);
+                listaProdutosLista.add(produto);
+                System.out.printf(" (%d) %s | %s | %s \n", contador, produto.getNome(), produto.getDescricao(), produto.getGtin13());
+                contador++;
+            }
+
+        }
+    } catch (Exception e) {
+
+    }
+    return listaProdutosLista;
+
 }
 
 
-    public ArrayList<Produto> mostrarProdutos(Lista lista){
-
-        ParIntInt parPesquisa = new ParIntInt(lista.getId(), -1);
-        ArrayList<Produto> listaProdutosLista = new ArrayList<>();
-        int contador = 1;
-        try {
-            ArrayList<ParIntInt> listaProdutos = relacaoListaProduto.read(parPesquisa);
-
-            System.out.println("Produtos:\n");
-            for (ParIntInt par : listaProdutos) {
-                int idLista = par.getNum1();
-                int idProduto = par.getNum2();
-                if (idLista == lista.getId()) {
-                    Produto produto = arqProdutos.read(idProduto);
-                    listaProdutosLista.add(produto);
-                    System.out.printf(" (%d) %s | %s | %s \n", contador, produto.getNome(), produto.getDescricao(), produto.getGtin13());
-                    contador++;
-                }
-
-            }
-        } catch (Exception e) {
-
-        }
-        return listaProdutosLista;
-
-    }
 
 }

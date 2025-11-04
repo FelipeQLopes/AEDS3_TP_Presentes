@@ -8,6 +8,7 @@ public class Produto implements Registro {
     private String nome;
     private String gtin13;
     private String descricao;
+    private boolean ativo = true;
 
     public Produto() {
         this.id = -1;
@@ -45,6 +46,10 @@ public class Produto implements Registro {
         return descricao;
     }
 
+    public boolean isAtivo() {
+        return ativo;
+    }
+
     public void setNome(String nome) {
         this.nome = nome;
     }
@@ -55,6 +60,10 @@ public class Produto implements Registro {
 
     public void setDescricao(String descricao) {
         this.descricao = descricao;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
     }
 
     @Override
