@@ -76,7 +76,7 @@ public class MenuLista {
     public void minhasListas() {
         
         String opcao;
-        int opcaoNum;
+        int opcaoNum = -1;
 
         do {
             System.out.println("\n\nPresenteFácil 1.0");
@@ -93,48 +93,45 @@ public class MenuLista {
             
             System.out.print("\nOpção: ");
 
-            opcao = console.nextLine();
-            opcaoNum = Integer.parseInt(opcao);
-            
-            if(opcaoNum <= 90 && opcaoNum >= 65){
-                exibirLista(listas.get(opcaoNum-65));
-            }else if(opcaoNum == 1){
-                criarLista();
-            }else if(opcaoNum == 0){
-                System.out.println("Voltando...");
-                break;
-            }else{
-                System.out.println("Opção inválida!");
-                break;
+            opcao = console.nextLine().trim().toUpperCase();
+            try{
+                if(opcao.length()==1 && Character.isLetter(opcao.charAt(0))){
+                    opcaoNum = (int)opcao.charAt(0);
+                    if(opcaoNum <= 90 && opcaoNum >= 65){
+                        exibirLista(listas.get(opcaoNum-65));
+                    }
+                }else{
+                    opcaoNum = Integer.parseInt(opcao);
+                    if(opcaoNum == 1){
+                            criarLista();
+                    }else if(opcaoNum == 0){
+                        System.out.println("Voltando...");
+                        break;
+                    }else{
+                        System.out.println("Opção inválida!");
+                        break;
+                    }
+                }
+
+            }catch(NumberFormatException e){
+                
             }
 
-        } while (opcaoNum != 0);
+        } while (!opcao.equals(0));
     }
 
-    public void alterarDados(){
+    public void alterarDados(String codigo){
 
-        String codigo;
 
         if (ID_GLOBAL == -1) {
             System.out.println("Você precisa estar logado para criar uma lista.");
             return;
         }
 
-        do {
-            System.out.print("\nDigite o código da lista a ser alterada: ");
-            codigo = console.nextLine();
-
-            if(codigo.isEmpty())
-                return; 
-
-            // Validação do CPF (11 dígitos e composto apenas por números)
-        } while (codigo.length() == 10);
-
-
         try {
             Lista lista = arqListas.read(codigo);
             if (lista != null) {
-                System.out.println("Lista encontrada:");
+                System.out.println("\n\nDados da Lista:");
                 System.out.println(lista.toString()+"\n");  // Exibe os dados do usuario para confirmação
                 System.out.print("Digite o nome da nova lista: ");
                 String nomeLista = console.nextLine();
@@ -164,12 +161,11 @@ public class MenuLista {
                 char resp = r.charAt(0);
 
                 if (resp == 'S' || resp == 's') {
-                    // Salva as alterações no arquivo
                     boolean alterado = arqListas.update(lista);
                     if (alterado) {
-                        System.out.println("Usuario alterado com sucesso.");
+                        System.out.println("Lista alterada com sucesso.");
                     } else {
-                        System.out.println("Erro ao alterar o usuario.");
+                        System.out.println("Erro ao alterar a lista.");
                     }
                 } else {
                     System.out.println("Alterações canceladas.");
@@ -180,7 +176,7 @@ public class MenuLista {
             }
 
         } catch (Exception e) {
-            System.out.println("Erro ao criar lista: " + e.getMessage());
+            System.out.println("Erro ao alterar lista: " + e.getMessage());
         }
     }
 
@@ -217,7 +213,7 @@ public class MenuLista {
         do {
             System.out.println("\n\nPresenteFácil 1.0");
             System.out.println("-----------------");
-            System.out.println("> Home > Listas > Minhas Listas > " + lista.getNome());
+            System.out.println("> Home > Listas > Minhas Listas > " + lista.getNome() + "\n");
             
             System.out.println(lista.toString());
             
@@ -238,8 +234,8 @@ public class MenuLista {
                     gerenciarProdutos(lista);
                     break;
                 case 2:
-                    alterarDados();
-                    break;
+                    alterarDados(lista.getCodigo());
+                    return;
                 case 0:
                     System.out.println("Voltando...");
                     break;
@@ -250,6 +246,7 @@ public class MenuLista {
 
         }while(opcao != 0);
         
+        
     }
 
     public void gerenciarProdutos(Lista lista){
@@ -258,9 +255,9 @@ public class MenuLista {
         do {
             System.out.println("\n\nPresenteFácil 1.0");
             System.out.println("-----------------");
-            System.out.println("> Home > Listas > Minhas Listas > " + lista.getNome() + " > Produtos");
+            System.out.println("> Home > Listas > Minhas Listas > " + lista.getNome() + " > Produtos\n");
             
-            System.out.println(lista.toString());
+            menuProduto.listarProdutosDaLista(lista);
             
             System.out.println("\n1 - Gerenciar Produtos da Lista");
             System.out.println("2 - Alterar Dados da Lista");

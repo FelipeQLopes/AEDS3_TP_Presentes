@@ -265,9 +265,9 @@ public class MenuUsuario {
         do {
             System.out.print("Resposta Secreta: ");
             respostaSecreta = console.nextLine();
-            if(respostaSecreta.length()<10)
-                System.err.println("Escreva uma pergunta váilida com ? e mais de 10 caracteres.");
-        } while(respostaSecreta.length()<10);
+            if(respostaSecreta.length()<5)
+                System.err.println("Escreva uma resposta válida com pelo menos 5 caracteres");
+        } while(respostaSecreta.length()<5);
 
         do {
             System.out.print("Data de nascimento (DD/MM/AAAA): ");

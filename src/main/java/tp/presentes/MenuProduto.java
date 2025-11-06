@@ -135,6 +135,38 @@ private void listarProdutosPaginado() {
     }
 }
 
+public ArrayList<Produto> listarProdutosDaLista(Lista lista) {
+
+    ParIntInt parPesquisa = new ParIntInt(lista.getId(), -1);
+    ArrayList<Produto> todos = new ArrayList<>();
+    int contador = 1;
+    try {
+
+        ArrayList<ParIntInt> listaProdutos = relacaoListaProduto.read(parPesquisa);
+        
+        System.out.println("Seus Produtos:\n");
+        for (ParIntInt par : listaProdutos) {
+            int idLista = par.getNum1();
+            int idProduto = par.getNum2();
+            if (idLista == lista.getId()) {
+                Produto produto = arqProdutos.read(idProduto);
+                todos.add(produto);
+                contador++;
+            }
+
+        }
+        contador = 1;
+        todos.sort((a,b) -> a.getNome().compareToIgnoreCase(b.getNome()));
+        for (Produto produto : todos) {
+            System.out.printf("(%c) - %s | %d\n", contador+64, produto.getNome() );
+            contador++;
+        }
+    } catch (Exception e) {
+
+    }
+    return todos;
+}
+
 private void cadastrarProduto() {
     try {
         System.out.print("Nome: ");
