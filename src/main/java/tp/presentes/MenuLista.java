@@ -252,40 +252,45 @@ public class MenuLista {
     }
 
     public void gerenciarProdutos(Lista lista){
-        int opcao = -1;
+    String opcao;
 
-        do {
-            System.out.println("\n\nPresenteFácil 1.0");
-            System.out.println("-----------------");
-            System.out.println("> Home > Listas > Minhas Listas > " + lista.getNome() + " > Produtos\n");
-            
-            menuProduto.listarProdutosDaLista(lista);
-            
-            System.out.println("\n1 - Acrescentar Produto");
-            System.out.println("0 - Voltar");
-            
-            System.out.print("\nOpção: ");
+    do {
+        System.out.println("\n\nPresenteFácil 1.0");
+        System.out.println("-----------------");
+        System.out.println("> Home > Listas > Minhas Listas > " + lista.getNome() + " > Produtos\n");
 
+        // pede ao MenuProduto para montar e retornar a lista exibida (agregada por GTIN)
+        ArrayList<ListaProduto> exibidos = menuProduto.listarProdutosDaLista(lista);
+
+        System.out.println("\n1 - Acrescentar Produto");
+        System.out.println("0 - Voltar");
+
+        System.out.print("\nOpção: ");
+        opcao = console.nextLine().trim().toUpperCase();
+
+        // tratamento de opções
+        if (opcao.equals("1")) {
+            acrescentarProdutos(lista);
+        } else if (opcao.equals("0")) {
+            System.out.println("Voltando...");
+        } else if (opcao.length() == 1 && opcao.charAt(0) >= 'A' && opcao.charAt(0) < 'A' + exibidos.size()) {
+            int indice = opcao.charAt(0) - 'A';
+            ListaProduto lp = exibidos.get(indice);
             try {
-                opcao = Integer.valueOf(console.nextLine());
-            } catch (NumberFormatException e) {
-                opcao = -1;
+                // pede ao MenuProduto para buscar o produto e abrir a view de detalhe/edição
+                Produto p = menuProduto.arqProdutos.read(lp.getIdProduto()); // se arqProdutos for público/visível; se não, crie um método público em MenuProduto para obter produto por id
+                menuProduto.exibirProdutoDaLista(lp);
+            } catch (Exception e) {
+                System.out.println("Erro ao abrir produto: " + e.getMessage());
             }
+        } else {
+            System.out.println("Opção inválida!");
+        }
 
-            switch(opcao){
-                case 1:
-                    acrescentarProdutos(lista);
-                    break;
-                case 0:
-                    System.out.println("Voltando...");
-                    break;
-                default:
-                    System.out.println("Opção inválida!");
-                    break;
-            }
+    } while (!opcao.equals("0"));
+}
 
-        }while (opcao != 0);
-    }
+
 
     public void acrescentarProdutos(Lista lista){
         int opcao = -1;
@@ -308,10 +313,10 @@ public class MenuLista {
 
             switch(opcao){
                 case 1:
-                    //input do gtin para pegar o produto
+                    menuProduto.buscarProdutoPorGtin(2, lista);
                     break;
                 case 2:
-                    //listar todos os produtos podendo selecionar os que vão entrar pra lista
+                    menuProduto.listarProdutosPaginado(2, lista);
                     return;
                 case 0:
                     System.out.println("Voltando...");

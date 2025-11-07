@@ -7,6 +7,7 @@ public class ListaProduto implements Registro {
     private int idLista;  
     private int idProduto;
     private int quantidade;
+    private String observacoes;
 
     public ListaProduto(){
         
@@ -47,6 +48,13 @@ public class ListaProduto implements Registro {
     public void setQuantidade(int quantidade) {
         this.quantidade = quantidade;
     }
+    public String getObservacoes() {
+        return observacoes == null ? "" : observacoes;
+    }
+    public void setObservacoes(String observacoes) {
+        this.observacoes = observacoes;
+    }
+
 
     // Serialização para bytes (salvar em arquivo)
 

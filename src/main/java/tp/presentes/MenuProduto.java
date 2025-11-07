@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.Comparator;
 import java.util.Collections;
+import java.util.Map;
+import java.util.LinkedHashMap;
+
 
 import tp.presentes.aed3.ArvoreBMais;
 
@@ -78,7 +81,7 @@ public class MenuProduto {
     }
     //endregion menu
 
-    private void buscarProdutoPorGtin(int modo, Lista lista) {
+    public void buscarProdutoPorGtin(int modo, Lista lista) {
         System.out.print("Digite o GTIN-13: ");
         String gtin = console.nextLine().trim();
         try {
@@ -104,7 +107,7 @@ public class MenuProduto {
     }
 
 
-    private void listarProdutosPaginado(int modo, Lista lista) {
+    public void listarProdutosPaginado(int modo, Lista lista) {
         try {
             ArrayList<Produto> todos = arqProdutos.listAll(); 
             todos.sort((a,b) -> a.getNome().compareToIgnoreCase(b.getNome()));
@@ -206,58 +209,112 @@ public class MenuProduto {
 
 
     public ArrayList<ListaProduto> listarProdutosDaLista(Lista lista) {
-        ParIntInt parPesquisa = new ParIntInt(lista.getId(), -1);
-        ArrayList<ListaProduto> todos = new ArrayList<>();
-        int contador = 1;
-        try {
-            ArrayList<ParIntInt> listaProdutos = relacaoListaProduto.read(parPesquisa);
+    ArrayList<ListaProduto> exibidos = new ArrayList<>();
 
-            System.out.println("Seus Produtos:\n");
-            if (listaProdutos == null || listaProdutos.isEmpty()) {
-                System.out.println("  (nenhum produto encontrado)");
-                return todos;
-            }
+    try {
+        ArrayList<ListaProduto> listaProdutos = arqListaProduto.readAll();
 
-            for (ParIntInt par : listaProdutos) {
-                if (par == null) continue;
-                int idLista = par.getNum1();
-                int idLp = par.getNum2(); // id do registro ListaProduto
-                if (idLista == lista.getId()) {
-                    ListaProduto lp = arqListaProduto.read(idLp);
-                    if (lp != null) {
-                        todos.add(lp);
-                    }
-                }
-            }
-
-            // ordenar por nome do produto associado
-            todos.sort((lp1, lp2) -> {
-                try {
-                    Produto p1 = arqProdutos.read(lp1.getIdProduto());
-                    Produto p2 = arqProdutos.read(lp2.getIdProduto());
-                    String n1 = p1 != null ? p1.getNome() : "";
-                    String n2 = p2 != null ? p2.getNome() : "";
-                    return n1.compareToIgnoreCase(n2);
-                } catch (Exception e) {
-                    return 0;
-                }
-            });
-
-            // imprime a lista com quantidades
-            for (ListaProduto lp : todos) {
-                Produto produto = null;
-                try {
-                    produto = arqProdutos.read(lp.getIdProduto());
-                } catch (Exception ignored) {}
-                String nome = produto != null ? produto.getNome() : "(produto não encontrado)";
-                System.out.printf("(%c) - %s | x%d\n", contador + 64, nome, lp.getQuantidade());
-                contador++;
-            }
-        } catch (Exception e) {
-            System.out.println("Erro ao listar produtos da lista: " + e.getMessage());
+        if (listaProdutos == null || listaProdutos.isEmpty()) {
+            System.out.println("Nenhum produto cadastrado nesta lista.");
+            return exibidos;
         }
-        return todos;
+
+        System.out.println("\nSeus Produtos:\n");
+
+        Map<String, Integer> quantidades = new LinkedHashMap<>();
+        Map<String, ListaProduto> referencia = new LinkedHashMap<>();
+        Map<String, Produto> produtosMap = new LinkedHashMap<>();
+
+        for (ListaProduto lp : listaProdutos) {
+            if (lp != null && lp.getIdLista() == lista.getId()) {
+                Produto p = arqProdutos.read(lp.getIdProduto());
+                if (p == null) continue;
+
+                String gtin = p.getGtin13();
+                quantidades.put(gtin, quantidades.getOrDefault(gtin, 0) + lp.getQuantidade());
+                referencia.putIfAbsent(gtin, lp);
+                produtosMap.putIfAbsent(gtin, p);
+            }
+        }
+
+        char letra = 'A';
+        for (String gtin : quantidades.keySet()) {
+            Produto p = produtosMap.get(gtin);
+            ListaProduto lpRef = referencia.get(gtin);
+            int qtd = quantidades.get(gtin);
+
+            System.out.printf("(%c) - %s | x%d\n", letra, p.getNome(), qtd);
+            exibidos.add(lpRef);
+            letra++;
+        }
+
+    } catch (Exception e) {
+        System.out.println("Erro ao listar produtos da lista: " + e.getMessage());
     }
+
+    return exibidos;
+}
+
+
+
+
+public void exibirProdutoDaLista(ListaProduto lp) {
+    try {
+        Produto produto = arqProdutos.read(lp.getIdProduto());
+        System.out.println("\n\nPresenteFácil 1.0");
+        System.out.println("-----------------");
+        System.out.println("> Início > Minhas listas > " + lp.getIdLista() + " > Produtos > " + produto.getNome() + "\n");
+
+        System.out.println("NOME.......: " + produto.getNome());
+        System.out.println("GTIN-13....: " + produto.getGtin13());
+        System.out.println("DESCRIÇÃO..: " + produto.getDescricao());
+        System.out.println("QUANTIDADE.: " + lp.getQuantidade());
+        System.out.println("OBSERVAÇÕES: " + lp.getObservacoes() + "\n");
+
+        System.out.println("(1) Alterar a quantidade");
+        System.out.println("(2) Alterar as observações");
+        System.out.println("(3) Remover o produto desta lista");
+        System.out.println("(R) Retornar ao menu anterior\n");
+
+        System.out.print("Opção: ");
+        String opcao = console.nextLine().trim().toUpperCase();
+
+        switch (opcao.charAt(0)) {
+            case '1':
+                System.out.print("Nova quantidade: ");
+                int novaQtd = Integer.parseInt(console.nextLine());
+                lp.setQuantidade(novaQtd);
+                arqListaProduto.update(lp);
+                break;
+
+            case '2':
+                System.out.print("Nova observação: ");
+                String obs = console.nextLine();
+                lp.setObservacoes(obs);
+                arqListaProduto.update(lp);
+                break;
+
+            case '3':
+                arqListaProduto.delete(lp.getIdLista(), lp.getIdProduto());
+                System.out.println("Produto removido da lista.");
+                return;
+
+            case 'R':
+                return;
+
+            default:
+                System.out.println("Opção inválida!");
+        }
+
+    } catch (Exception e) {
+        System.out.println("Erro ao manipular produto da lista: " + e.getMessage());
+    }
+}
+
+
+
+
+
 
     private void cadastrarProduto() {
         try {
