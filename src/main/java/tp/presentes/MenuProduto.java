@@ -159,93 +159,98 @@ public class MenuProduto {
     }
 
     public void adicionarProdutoNaLista(Lista lista, Produto produto, int quantidade) {
-        try {
-            // 1) procurar associações existentes para essa lista (relacaoListaProduto armazena: (idLista, idListaProduto))
-            ArrayList<ParIntInt> rels = relacaoListaProduto.read(new ParIntInt(lista.getId(), -1));
-            ListaProduto existente = null;
-            int idListaProdutoExistente = -1;
+    try {
+        ArrayList<ListaProduto> todos = arqListaProduto.readAll();
+        ListaProduto existente = null;
 
-            if (rels != null) {
-                for (ParIntInt p : rels) {
-                    int idListaFromRel = p.getNum1();
-                    int idLp = p.getNum2(); // id do registro ListaProduto
-                    if (idListaFromRel != lista.getId()) continue;
-                    ListaProduto lp = arqListaProduto.read(idLp);
-                    if (lp != null && lp.getIdProduto() == produto.getId()) {
-                        existente = lp;
-                        idListaProdutoExistente = idLp;
-                        break;
-                    }
-                }
+        // verifica se já existe o mesmo produto nessa lista
+        for (ListaProduto lp : todos) {
+            if (lp.getIdLista() == lista.getId() && lp.getIdProduto() == produto.getId()) {
+                existente = lp;
+                break;
             }
-
-            // 2) se existe, só aumenta a quantidade e faz update
-            if (existente != null) {
-                existente.setQuantidade(existente.getQuantidade() + quantidade);
-                boolean ok = arqListaProduto.update(existente);
-                if (ok) System.out.println("Quantidade atualizada: " + existente.getQuantidade());
-                else System.out.println("Falha ao atualizar quantidade.");
-                return;
-            }
-
-            // 3) se não existe, cria ListaProduto e cria as relações
-            ListaProduto novo = new ListaProduto();
-            novo.setIdLista(lista.getId());
-            novo.setIdProduto(produto.getId());
-            novo.setQuantidade(quantidade);
-
-            int idNovo = arqListaProduto.create(novo); // retorna id do registro criado
-
-            // cria relações que apontam para esse registro de associação (idNovo)
-            relacaoListaProduto.create(new ParIntInt(lista.getId(), idNovo));
-            relacaoProdutoLista.create(new ParIntInt(produto.getId(), idNovo));
-
-            System.out.println("Produto adicionado à lista. quantidade = " + quantidade);
-        } catch (Exception e) {
-            System.out.println("Erro ao adicionar produto à lista: " + e.getMessage());
-            e.printStackTrace();
         }
+
+        if (existente != null) {
+            // se já existe, apenas soma a quantidade
+            existente.setQuantidade(existente.getQuantidade() + quantidade);
+            arqListaProduto.update(existente);
+            System.out.println("Quantidade atualizada: " + existente.getQuantidade());
+            return;
+        }
+
+        // caso contrário, cria um novo registro
+        ListaProduto novo = new ListaProduto();
+        novo.setIdLista(lista.getId());
+        novo.setIdProduto(produto.getId());
+        novo.setQuantidade(quantidade);
+        novo.setObservacoes("");
+
+        int idNovo = arqListaProduto.create(novo);
+
+        // adiciona o relacionamento nas árvores de índice
+        relacaoListaProduto.create(new ParIntInt(lista.getId(), produto.getId()));
+        relacaoProdutoLista.create(new ParIntInt(produto.getId(), lista.getId()));
+
+        System.out.println("Produto adicionado à lista. ID=" + idNovo);
+
+    } catch (Exception e) {
+        System.out.println("Erro ao adicionar produto à lista: " + e.getMessage());
+        e.printStackTrace();
     }
+}
+
+
+
 
 
     public ArrayList<ListaProduto> listarProdutosDaLista(Lista lista) {
     ArrayList<ListaProduto> exibidos = new ArrayList<>();
 
     try {
-        ArrayList<ListaProduto> listaProdutos = arqListaProduto.readAll();
+        ArrayList<ListaProduto> todos = arqListaProduto.readAll();
 
-        if (listaProdutos == null || listaProdutos.isEmpty()) {
-            System.out.println("Nenhum produto cadastrado nesta lista.");
-            return exibidos;
+        System.out.println("\n--- DEBUG ListaProduto no arquivo ---");
+        for (ListaProduto lp : todos) {
+            if (lp != null)
+                System.out.printf("id=%d | idLista=%d | idProduto=%d | qtd=%d | obs=%s%n",
+                        lp.getId(), lp.getIdLista(), lp.getIdProduto(),
+                        lp.getQuantidade(), lp.getObservacoes());
         }
+        System.out.println("--- FIM DEBUG ---\n");
 
-        System.out.println("\nSeus Produtos:\n");
+        System.out.println("Seus Produtos:\n");
 
-        Map<String, Integer> quantidades = new LinkedHashMap<>();
-        Map<String, ListaProduto> referencia = new LinkedHashMap<>();
-        Map<String, Produto> produtosMap = new LinkedHashMap<>();
-
-        for (ListaProduto lp : listaProdutos) {
-            if (lp != null && lp.getIdLista() == lista.getId()) {
+        for (ListaProduto lp : todos) {
+            if (lp.getIdLista() == lista.getId()) {
                 Produto p = arqProdutos.read(lp.getIdProduto());
-                if (p == null) continue;
-
-                String gtin = p.getGtin13();
-                quantidades.put(gtin, quantidades.getOrDefault(gtin, 0) + lp.getQuantidade());
-                referencia.putIfAbsent(gtin, lp);
-                produtosMap.putIfAbsent(gtin, p);
+                if (p != null) {
+                    exibidos.add(lp);
+                }
             }
         }
 
-        char letra = 'A';
-        for (String gtin : quantidades.keySet()) {
-            Produto p = produtosMap.get(gtin);
-            ListaProduto lpRef = referencia.get(gtin);
-            int qtd = quantidades.get(gtin);
+        if (exibidos.isEmpty()) {
+            System.out.println("  (nenhum produto encontrado)");
+        } else {
+            exibidos.sort((a, b) -> {
+                try {
+                    Produto p1 = arqProdutos.read(a.getIdProduto());
+                    Produto p2 = arqProdutos.read(b.getIdProduto());
+                    if (p1 == null || p2 == null) return 0;
+                    return p1.getNome().compareToIgnoreCase(p2.getNome());
+                } catch (Exception e) {
+                    return 0;
+                }
+            });
 
-            System.out.printf("(%c) - %s | x%d\n", letra, p.getNome(), qtd);
-            exibidos.add(lpRef);
-            letra++;
+            int i = 0;
+            for (ListaProduto lp : exibidos) {
+                Produto prod = arqProdutos.read(lp.getIdProduto());
+                String nome = (prod != null) ? prod.getNome() : "(produto não encontrado)";
+                System.out.printf("(%c) - %s | x%d%n", (char) ('A' + i), nome, lp.getQuantidade());
+                i++;
+            }
         }
 
     } catch (Exception e) {
@@ -279,24 +284,51 @@ public void exibirProdutoDaLista(ListaProduto lp) {
         System.out.print("Opção: ");
         String opcao = console.nextLine().trim().toUpperCase();
 
-        switch (opcao.charAt(0)) {
+        switch (opcao.isEmpty() ? ' ' : opcao.charAt(0)) {
             case '1':
                 System.out.print("Nova quantidade: ");
-                int novaQtd = Integer.parseInt(console.nextLine());
+                int novaQtd;
+                try {
+                    novaQtd = Integer.parseInt(console.nextLine().trim());
+                } catch (NumberFormatException ex) {
+                    System.out.println("Quantidade inválida.");
+                    break;
+                }
                 lp.setQuantidade(novaQtd);
-                arqListaProduto.update(lp);
+                if (arqListaProduto.update(lp)) {
+                    System.out.println("Quantidade atualizada com sucesso.");
+                } else {
+                    System.out.println("Falha ao atualizar quantidade.");
+                }
                 break;
 
             case '2':
                 System.out.print("Nova observação: ");
                 String obs = console.nextLine();
                 lp.setObservacoes(obs);
-                arqListaProduto.update(lp);
+                if (arqListaProduto.update(lp)) {
+                    System.out.println("Observação atualizada com sucesso.");
+                } else {
+                    System.out.println("Falha ao atualizar observação.");
+                }
                 break;
 
             case '3':
-                arqListaProduto.delete(lp.getIdLista(), lp.getIdProduto());
-                System.out.println("Produto removido da lista.");
+                // supondo que delete(id) exista — se não existir, use sua versão delete(idLista,idProduto)
+                if (arqListaProduto.delete(lp.getId())) {
+                    System.out.println("Produto removido da lista.");
+                } else {
+                    // fallback se você só tiver delete(idLista,idProduto)
+                    try {
+                        if (arqListaProduto.delete(lp.getIdLista(), lp.getIdProduto())) {
+                            System.out.println("Produto removido da lista.");
+                        } else {
+                            System.out.println("Falha ao remover o produto da lista.");
+                        }
+                    } catch (Exception ignored) {
+                        System.out.println("Falha ao remover o produto da lista.");
+                    }
+                }
                 return;
 
             case 'R':
@@ -310,8 +342,6 @@ public void exibirProdutoDaLista(ListaProduto lp) {
         System.out.println("Erro ao manipular produto da lista: " + e.getMessage());
     }
 }
-
-
 
 
 

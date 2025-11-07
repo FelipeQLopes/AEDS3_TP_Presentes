@@ -59,27 +59,42 @@ public class ListaProduto implements Registro {
     // Serialização para bytes (salvar em arquivo)
 
     public byte[] toByteArray() throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        DataOutputStream dos = new DataOutputStream(baos);
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    DataOutputStream dos = new DataOutputStream(baos);
 
-        dos.writeInt(this.id);
-        dos.writeInt(this.idLista);
-        dos.writeInt(this.idProduto);
-        dos.writeInt(this.quantidade);
+    dos.writeInt(this.id);
+    dos.writeInt(this.idLista);
+    dos.writeInt(this.idProduto);
+    dos.writeInt(this.quantidade);
+    
+    // salva observação (string variável)
+    byte[] obsBytes = this.observacoes != null ? this.observacoes.getBytes("UTF-8") : new byte[0];
+    dos.writeInt(obsBytes.length);
+    dos.write(obsBytes);
 
-        return baos.toByteArray();
+    return baos.toByteArray();
+}
+
+public void fromByteArray(byte[] b) throws IOException {
+    ByteArrayInputStream bais = new ByteArrayInputStream(b);
+    DataInputStream dis = new DataInputStream(bais);
+
+    this.id = dis.readInt();
+    this.idLista = dis.readInt();
+    this.idProduto = dis.readInt();
+    this.quantidade = dis.readInt();
+
+    int obsLength = dis.readInt();
+    if (obsLength > 0) {
+        byte[] obsBytes = new byte[obsLength];
+        dis.readFully(obsBytes);
+        this.observacoes = new String(obsBytes, "UTF-8");
+    } else {
+        this.observacoes = "";
     }
+}
 
-    public void fromByteArray(byte[] b) throws IOException {
-        ByteArrayInputStream bais = new ByteArrayInputStream(b);
-        DataInputStream dis = new DataInputStream(bais);
 
-        this.id = dis.readInt();
-        this.idLista = dis.readInt();
-        this.idProduto = dis.readInt();
-        this.quantidade = dis.readInt();
-
-    }
 
 
 }

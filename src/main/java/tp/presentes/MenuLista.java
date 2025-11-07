@@ -317,7 +317,7 @@ public class MenuLista {
                     break;
                 case 2:
                     menuProduto.listarProdutosPaginado(2, lista);
-                    return;
+                    break;
                 case 0:
                     System.out.println("Voltando...");
                     break;

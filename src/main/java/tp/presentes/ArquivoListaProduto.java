@@ -42,24 +42,28 @@ public class ArquivoListaProduto extends Arquivo<ListaProduto> {
     }
 
     public boolean delete(int idLista, int idProduto) throws Exception {
-        ParIDListaID pci = indiceIndiretoIdListaProduto.read(ParIDListaID.hash(idLista, idProduto));
-        if (pci != null) {
-            return delete(pci.getId());
+    ParIDListaID pci = indiceIndiretoIdListaProduto.read(ParIDListaID.hash(idLista, idProduto));
+    if (pci != null) {
+        ListaProduto lp = super.read(pci.getId());
+        if (lp != null && super.delete(pci.getId())) {
+            return indiceIndiretoIdListaProduto.delete(ParIDListaID.hash(idLista, idProduto));
         }
-        return false;
     }
+    return false;
+}
 
-   @Override
+
+  @Override
 public boolean update(ListaProduto novoListaProduto) throws Exception {
     ListaProduto listaProdutoVelha = read(novoListaProduto.getIdLista(), novoListaProduto.getIdProduto());
 
-    // Caso o produto antigo não seja encontrado, apenas atualiza diretamente
     if (listaProdutoVelha == null) {
-        return super.update(novoListaProduto);
+        return false; // nada pra atualizar
     }
 
+    novoListaProduto.setId(listaProdutoVelha.getId());
+
     if (super.update(novoListaProduto)) {
-        // Se o ID de lista ou produto mudou, atualiza o índice indireto
         if (novoListaProduto.getIdLista() != listaProdutoVelha.getIdLista() ||
             novoListaProduto.getIdProduto() != listaProdutoVelha.getIdProduto()) {
 
@@ -68,7 +72,11 @@ public boolean update(ListaProduto novoListaProduto) throws Exception {
             );
 
             indiceIndiretoIdListaProduto.create(
-                new ParIDListaID(novoListaProduto.getIdLista(), novoListaProduto.getIdProduto(), novoListaProduto.getId())
+                new ParIDListaID(
+                    novoListaProduto.getIdLista(),
+                    novoListaProduto.getIdProduto(),
+                    novoListaProduto.getId()
+                )
             );
         }
         return true;
@@ -78,17 +86,26 @@ public boolean update(ListaProduto novoListaProduto) throws Exception {
 }
 
 
+
     public ArrayList<ListaProduto> readAll() throws Exception {
-        ArrayList<ListaProduto> lista = new ArrayList<>();
-        int id = 1;
-        ListaProduto lp;
-        while (true) {
-            lp = super.read(id);
-            if (lp == null)
-                break;
+    ArrayList<ListaProduto> lista = new ArrayList<>();
+    int id = 1;
+    int falhasSeguidas = 0;
+    ListaProduto lp;
+
+    while (falhasSeguidas < 10_000) { // evita loop infinito se IDs forem espaçados
+        lp = super.read(id);
+        if (lp != null) {
             lista.add(lp);
-            id++;
+            falhasSeguidas = 0;
+        } else {
+            falhasSeguidas++;
         }
-        return lista;
+        id++;
     }
+
+    return lista;
+}
+
+
 }
