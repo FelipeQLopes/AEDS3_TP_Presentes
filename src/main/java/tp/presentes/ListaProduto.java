@@ -8,6 +8,21 @@ public class ListaProduto implements Registro {
     private int idProduto;
     private int quantidade;
 
+    public ListaProduto(){
+        
+        this(-1,-1,-1,0);
+
+    }
+
+    public ListaProduto(int id, int idLista, int idProduto, int quantidade){
+
+        this.id = id;
+        this.idLista = idLista;
+        this.idProduto = idProduto;
+        this.quantidade = quantidade;
+
+    }
+
     public int getId() {
         return id;
     }

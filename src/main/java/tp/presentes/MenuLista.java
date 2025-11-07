@@ -13,6 +13,7 @@ public class MenuLista {
     private String CPF_GLOBAL;
 
     private ArquivoLista arqListas;
+    private ArquivoListaProduto arqListaProduto;
     private MenuProduto menuProduto;
     private ArvoreBMais<ParIntInt> relacaoUsuarioLista;
     private ArvoreBMais<ParIntInt> relacaoListaProduto;
@@ -26,6 +27,7 @@ public class MenuLista {
         
         this.menuProduto = new MenuProduto(ID_GLOBAL, NOME_GLOBAL, CPF_GLOBAL);
         this.arqListas = new ArquivoLista();
+        this.arqListaProduto = new ArquivoListaProduto();
         this.relacaoUsuarioLista = new ArvoreBMais<>(ParIntInt.class.getConstructor(), 5, "./src/main/resources/dados/relacaoUsuarioLista.db");
         this.relacaoListaProduto = new ArvoreBMais<>(ParIntInt.class.getConstructor(), 5, "./src/main/resources/dados/relacaoListaProduto.db");
         this.relacaoProdutoLista = new ArvoreBMais<>(ParIntInt.class.getConstructor(), 5, "./src/main/resources/dados/relacaoProdutoLista.db");
@@ -259,8 +261,7 @@ public class MenuLista {
             
             menuProduto.listarProdutosDaLista(lista);
             
-            System.out.println("\n1 - Gerenciar Produtos da Lista");
-            System.out.println("2 - Alterar Dados da Lista");
+            System.out.println("\n1 - Acrescentar Produto");
             System.out.println("0 - Voltar");
             
             System.out.print("\nOpção: ");
@@ -270,7 +271,7 @@ public class MenuLista {
             } catch (NumberFormatException e) {
                 opcao = -1;
             }
-    }while (opcao != 0);
+        }while (opcao != 0);
     }
 
     public void buscarListas() {

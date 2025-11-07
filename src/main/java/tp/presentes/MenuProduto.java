@@ -136,8 +136,8 @@ private void listarProdutosPaginado() {
 }
 
 public ArrayList<Produto> listarProdutosDaLista(Lista lista) {
-
-    ParIntInt parPesquisa = new ParIntInt(lista.getId(), -1);
+    int parIdLista = ParIDListaID.hash(lista.getId());
+    ParIntInt parPesquisa = new ParIntInt(parIdLista, -1);
     ArrayList<Produto> todos = new ArrayList<>();
     int contador = 1;
     try {
