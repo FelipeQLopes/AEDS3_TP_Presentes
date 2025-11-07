@@ -271,6 +271,56 @@ public class MenuLista {
             } catch (NumberFormatException e) {
                 opcao = -1;
             }
+
+            switch(opcao){
+                case 1:
+                    acrescentarProdutos(lista);
+                    break;
+                case 0:
+                    System.out.println("Voltando...");
+                    break;
+                default:
+                    System.out.println("Opção inválida!");
+                    break;
+            }
+
+        }while (opcao != 0);
+    }
+
+    public void acrescentarProdutos(Lista lista){
+        int opcao = -1;
+
+        do {
+            System.out.println("\n\nPresenteFácil 1.0");
+            System.out.println("-----------------");
+            System.out.println("> Home > Listas > Minhas Listas > " + lista.getNome() + " > Produtos > Acrescentar Produto\n");
+            System.out.println("\n1 - Buscar Produtos pelo GTIN");
+            System.out.println("2 - Listar Todos os Produtos");
+            System.out.println("0 - Voltar");
+            
+            System.out.print("\nOpção: ");
+
+            try {
+                opcao = Integer.valueOf(console.nextLine());
+            } catch (NumberFormatException e) {
+                opcao = -1;
+            }
+
+            switch(opcao){
+                case 1:
+                    //input do gtin para pegar o produto
+                    break;
+                case 2:
+                    //listar todos os produtos podendo selecionar os que vão entrar pra lista
+                    return;
+                case 0:
+                    System.out.println("Voltando...");
+                    break;
+                default:
+                    System.out.println("Opção inválida!");
+                    break;
+            }
+
         }while (opcao != 0);
     }
 
