@@ -299,8 +299,9 @@ public class MenuLista {
             System.out.println("\n\nPresenteFácil 1.0");
             System.out.println("-----------------");
             System.out.println("> Home > Listas > Minhas Listas > " + lista.getNome() + " > Produtos > Acrescentar Produto\n");
-            System.out.println("\n1 - Buscar Produtos pelo GTIN");
-            System.out.println("2 - Listar Todos os Produtos");
+            System.out.println("\n1 - Buscar Produtos pelo Nome");
+            System.out.println("2 - Buscar Produtos pelo GTIN");
+            System.out.println("3 - Listar Todos os Produtos");
             System.out.println("0 - Voltar");
             
             System.out.print("\nOpção: ");
@@ -313,9 +314,12 @@ public class MenuLista {
 
             switch(opcao){
                 case 1:
-                    menuProduto.buscarProdutoPorGtin(2, lista);
+                    menuProduto.listarProdutosPorNome(2, lista);
                     break;
                 case 2:
+                    menuProduto.buscarProdutoPorGtin(2, lista);
+                    break;
+                case 3:
                     menuProduto.listarProdutosPaginado(2, lista);
                     break;
                 case 0:

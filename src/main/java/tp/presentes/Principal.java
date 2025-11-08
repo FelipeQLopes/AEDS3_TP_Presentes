@@ -1,5 +1,9 @@
 package tp.presentes;
 import java.util.Scanner;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.io.IOException;
+
 
 public class Principal {
 
@@ -7,7 +11,7 @@ public class Principal {
         try {
             ArquivoUsuario arqUsuarios = new ArquivoUsuario();
             ArquivoLista arqListas = new ArquivoLista();
-
+            Files.createDirectories(Paths.get("./src/main/resources/dados/listaInvertida"));
 
             Scanner console = new Scanner(System.in);
             int usuarioLogadoId = -1;
