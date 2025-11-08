@@ -73,8 +73,7 @@ public class ArquivoProduto extends Arquivo<Produto> {
             p = super.read(id);
             if (p == null)
                 break;
-            if (p.isAtivo())
-                lista.add(p);
+            lista.add(p);
             id++;
         }
 

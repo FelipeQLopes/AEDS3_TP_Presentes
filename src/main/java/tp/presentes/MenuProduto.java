@@ -91,11 +91,15 @@ public class MenuProduto {
                     System.out.println("\nProduto encontrado:\n" + p.toString());
                     mostrarProdutoDetalhes(p);
                 }else if(modo == 2){
-                    System.out.println("Você quer adicionar o produto: " + p.getNome() + "a sua lista?");
-                    System.out.println("S/N");
-                    String opt = console.nextLine().trim();
-                    if (opt.equalsIgnoreCase("S")){
-                        adicionarProdutoNaLista(lista, p, 1);
+                    if(p.isAtivo()){
+                        System.out.println("Você quer adicionar o produto: " + p.getNome() + " a sua lista?");
+                        System.out.println("S/N");
+                        String opt = console.nextLine().trim();
+                        if (opt.equalsIgnoreCase("S")){
+                            adicionarProdutoNaLista(lista, p, 1);
+                        }
+                    }else{                    
+                        System.out.println("Esse produto foi inativado");
                     }
                 }
             } else {
@@ -121,7 +125,7 @@ public class MenuProduto {
                 System.out.printf("\nPresenteFácil 1.0\n-----------------\n> Início > Produtos > Listagem\n\nPágina %d de %d\n\n", page, totalPages);
                 for (int i = start; i < end; i++) {
                     Produto p = todos.get(i);
-                    System.out.printf("(%d) %s\n", (i - start) + 1, p.getNome());
+                    System.out.println("(" + ((i - start) + 1) + ") " + p.getNome() + (p.isAtivo() ? "" : " (Inativo)"));
                 }
                 System.out.println("\n(A) Página anterior  (P) Próxima página  (R) Retornar");
                 System.out.print("Opção: ");
@@ -138,11 +142,15 @@ public class MenuProduto {
                             if(modo == 1){
                                 mostrarProdutoDetalhes(escolhido);
                             }else if(modo == 2){
-                                System.out.println("Você quer adicionar o produto: " + escolhido.getNome() + "a sua lista?");
-                                System.out.println("S/N");
-                                opt = console.nextLine().trim();
-                                if (opt.equalsIgnoreCase("S")){
-                                    adicionarProdutoNaLista(lista, escolhido, 1);
+                                if(escolhido.isAtivo()){
+                                    System.out.println("Você quer adicionar o produto: " + escolhido.getNome() + " a sua lista?");
+                                    System.out.println("S/N");
+                                    opt = console.nextLine().trim();
+                                    if (opt.equalsIgnoreCase("S")){
+                                        adicionarProdutoNaLista(lista, escolhido, 1);
+                                    }
+                                }else{                    
+                                    System.out.println("Esse produto foi inativado");
                                 }
                             }
                         } else {
@@ -210,21 +218,12 @@ public class MenuProduto {
     try {
         ArrayList<ListaProduto> todos = arqListaProduto.readAll();
 
-        System.out.println("\n--- DEBUG ListaProduto no arquivo ---");
-        for (ListaProduto lp : todos) {
-            if (lp != null)
-                System.out.printf("id=%d | idLista=%d | idProduto=%d | qtd=%d | obs=%s%n",
-                        lp.getId(), lp.getIdLista(), lp.getIdProduto(),
-                        lp.getQuantidade(), lp.getObservacoes());
-        }
-        System.out.println("--- FIM DEBUG ---\n");
-
         System.out.println("Seus Produtos:\n");
 
         for (ListaProduto lp : todos) {
             if (lp.getIdLista() == lista.getId()) {
                 Produto p = arqProdutos.read(lp.getIdProduto());
-                if (p != null) {
+                if (p != null && p.isAtivo()) {
                     exibidos.add(lp);
                 }
             }
@@ -364,7 +363,7 @@ public void exibirProdutoDaLista(ListaProduto lp) {
                 System.out.println("Já existe um produto com esse GTIN: " + existente.getNome());
                 return;
             }
-            Produto p = new Produto(nome, gtin, descricao);
+            Produto p = new Produto(nome, gtin, descricao, true);
             int id = arqProdutos.create(p);
             System.out.println("Produto cadastrado com ID: " + id);
         } catch (Exception e) {
@@ -396,13 +395,13 @@ public void exibirProdutoDaLista(ListaProduto lp) {
             // se erro, só ignora
         }
 
-        System.out.println("\n(1) Alterar os dados do produto\n(2) Inativar o produto\n(R) Retornar");
+        System.out.println("\n(1) Alterar os dados do produto\n(2) " + (p.isAtivo()? "Inativar" : "Ativar") + " o produto\n(R) Retornar");
         System.out.print("Opção: ");
         String op = console.nextLine().trim();
         if (op.equals("1")) {
             alterarProduto(p);
         } else if (op.equals("2")) {
-            inativarProduto(p);
+            ativarInativarProduto(p, !p.isAtivo());
         }
     }
 
@@ -422,16 +421,16 @@ public void exibirProdutoDaLista(ListaProduto lp) {
         }
     }
 
-    private void inativarProduto(Produto p) {
+    private void ativarInativarProduto(Produto p, boolean estado) {
         try {
-            p.setAtivo(false);
+            p.setAtivo(estado);
             if (arqProdutos.update(p)) {
-                System.out.println("Produto inativado com sucesso.");
+                System.out.println("Produto " + (estado ? "" : "in") +"ativado com sucesso.");
             } else {
-                System.out.println("Falha ao inativar produto.");
+                System.out.println("Falha ao " + (estado ? "" : "in") +"ativar produto.");
             }
         } catch (Exception e) {
-            System.out.println("Erro ao inativar produto: " + e.getMessage());
+            System.out.println("Erro ao " + (estado ? "" : "in") +"ativar produto: " + e.getMessage());
         }
     }
 

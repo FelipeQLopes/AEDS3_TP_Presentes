@@ -8,20 +8,22 @@ public class Produto implements Registro {
     private String nome;
     private String gtin13;
     private String descricao;
-    private boolean ativo = true;
+    private boolean ativo;
 
     public Produto() {
         this.id = -1;
         this.nome = "";
         this.gtin13 = "";
         this.descricao = "";
+        this.ativo = true;
     }
 
-    public Produto(String nome, String gtin13, String descricao) {
+    public Produto(String nome, String gtin13, String descricao, boolean ativo) {
         this.id = -1;
         this.nome = nome;
         this.gtin13 = gtin13;
         this.descricao = descricao;
+        this.ativo = ativo;
     }
 
     @Override
@@ -82,6 +84,7 @@ public class Produto implements Registro {
         dos.writeUTF(nome);
         dos.writeUTF(gtin13);
         dos.writeUTF(descricao);
+        dos.writeBoolean(ativo);
         return baos.toByteArray();
     }
 
@@ -94,5 +97,6 @@ public class Produto implements Registro {
         nome = dis.readUTF();
         gtin13 = dis.readUTF();
         descricao = dis.readUTF();
+        ativo = dis.readBoolean();
     }
 }
