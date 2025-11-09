@@ -134,24 +134,24 @@ public class MenuLista {
             Lista lista = arqListas.read(codigo);
             if (lista != null) {
                 System.out.println("\n\nDados da Lista:");
-                System.out.println(lista.toString()+"\n");  // Exibe os dados do usuario para confirmação
+                System.out.println(lista.toString()+"\n");  
                 System.out.print("Digite o nome da nova lista: ");
                 String nomeLista = console.nextLine();
                 if (!nomeLista.isEmpty()) {
-                    lista.setNome(nomeLista);  // Atualiza o CPF se fornecido
+                    lista.setNome(nomeLista);  
                 }
 
                 System.out.print("Digite a descrição da lista: ");
                 String descricaoLista = console.nextLine();
                 if (!descricaoLista.isEmpty()) {
-                    lista.setDescricao(descricaoLista);  // Atualiza o CPF se fornecido
+                    lista.setDescricao(descricaoLista);  
                 }
 
                 System.out.print("Digite a data limite (YYYY-MM-DD): ");
                 String dataLimiteStr = console.nextLine();
                 LocalDate dataLimite = LocalDate.parse(dataLimiteStr);
                 if (!dataLimiteStr.isEmpty()) {
-                    lista.setDataLimite(dataLimite);  // Atualiza o CPF se fornecido
+                    lista.setDataLimite(dataLimite);
                 }
 
                 String r;
