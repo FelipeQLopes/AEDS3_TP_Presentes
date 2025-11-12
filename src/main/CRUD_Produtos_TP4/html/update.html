@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/update.css">
+    <link rel="stylesheet" href="../css/topnav.css">
+    <link rel="stylesheet" href="../css/font.css">
+    <script src="../js/update.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Update</title>
+</head>
+
+<body>
+    <div class="topnav">
+        <a href="home.html">Home</a>
+        <a href="create.html">Create</a>
+        <a href="read.html">Read</a>
+        <a class="active" href="update.html">Update</a>
+        <a href="delete.html">Delete</a>
+    </div>
+
+    <div class="main">
+        <div class="search-container">
+            <input id="searchInput" type="text" placeholder="Pesquisar produto...">
+        </div>
+
+        <div id="produtosContainer" class="cards-container"></div>
+    </div>
+
+    <!-- POPUP (Formulário de Edição) -->
+    <div id="popup" class="popup">
+        <div class="popup-content">
+            <span id="closePopup" class="close">&times;</span>
+            <h2>Editar Produto</h2>
+            <form id="editForm">
+                <div class="icon-selector">
+                    <i class="fa-solid fa-box icon-option"></i>
+                    <i class="fa-solid fa-bottle-water icon-option"></i>
+                    <i class="fa-solid fa-laptop icon-option"></i>
+                    <i class="fa-solid fa-utensils icon-option"></i>
+                    <i class="fa-solid fa-mobile-screen-button icon-option"></i>
+                    <i class="fa-solid fa-shirt icon-option"></i>
+                    <i class="fa-solid fa-couch icon-option"></i>
+                    <i class="fa-solid fa-car icon-option"></i>
+                    <i class="fa-solid fa-basket-shopping icon-option"></i>
+                    <i class="fa-solid fa-mug-saucer icon-option"></i>
+                    <i class="fa-solid fa-bolt icon-option"></i>
+                    <i class="fa-solid fa-lightbulb icon-option"></i>
+                    <i class="fa-solid fa-tv icon-option"></i>
+                    <i class="fa-solid fa-gamepad icon-option"></i>
+                    <i class="fa-solid fa-headphones icon-option"></i>
+                </div>
+
+                <div class="selected-icon">
+                    <i id="selectedIcon" class="fa-solid fa-box"></i>
+                </div>
+
+                <label for="editNome">Produto</label>
+                <input id="editNome" type="text" name="nomeProduto" required>
+
+                <label for="editGtin">GTIN-13</label>
+                <input id="editGtin" type="text" placeholder="Insira o GTIN" name="gtin" required pattern="\d{13}"
+                    minlength="13" inputmode="numeric" title="O GTIN deve conter exatamente 13 dígitos numéricos">
+
+
+                <label for="editDescricao">Descrição</label>
+                <input id="editDescricao" type="text" name="descricao" required>
+
+                <button type="submit">Salvar Alterações</button>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,4 +1,5 @@
 package tp.presentes;
+
 import tp.presentes.aed3.*;
 import java.time.LocalDate;
 import java.io.*;
@@ -26,39 +27,73 @@ public class Lista implements Registro {
         this.dataLimite = dataLimite;
         this.idUsuario = idUsuario;
         this.codigo = NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR,
-                                               NanoIdUtils.DEFAULT_ALPHABET,
-                                               10);
+                NanoIdUtils.DEFAULT_ALPHABET,
+                10);
     }
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public int getId() {
+        return id;
+    }
 
-    public String getNome() { return nome; }
-    public void setNome(String nome) { this.nome = nome; }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-    public String getDescricao() { return descricao; }
-    public void setDescricao(String descricao) { this.descricao = descricao; }
+    public String getNome() {
+        return nome;
+    }
 
-    public String getCodigo() { return codigo; }
-    public void setCodigo(String codigo) { this.codigo = codigo; }
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
 
-    public LocalDate getDataCriacao() { return dataCriacao; }
-    public void setDataCriacao(LocalDate dataCriacao) { this.dataCriacao = dataCriacao; }
+    public String getDescricao() {
+        return descricao;
+    }
 
-    public LocalDate getDataLimite() { return dataLimite; }
-    public void setDataLimite(LocalDate dataLimite) { this.dataLimite = dataLimite; }
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
+    }
 
-    public int getIdUsuario() { return idUsuario; }
-    public void setIdUsuario(int idUsuario) { this.idUsuario = idUsuario; }
+    public String getCodigo() {
+        return codigo;
+    }
+
+    public void setCodigo(String codigo) {
+        this.codigo = codigo;
+    }
+
+    public LocalDate getDataCriacao() {
+        return dataCriacao;
+    }
+
+    public void setDataCriacao(LocalDate dataCriacao) {
+        this.dataCriacao = dataCriacao;
+    }
+
+    public LocalDate getDataLimite() {
+        return dataLimite;
+    }
+
+    public void setDataLimite(LocalDate dataLimite) {
+        this.dataLimite = dataLimite;
+    }
+
+    public int getIdUsuario() {
+        return idUsuario;
+    }
+
+    public void setIdUsuario(int idUsuario) {
+        this.idUsuario = idUsuario;
+    }
 
     @Override
     public String toString() {
-        return
-            "Código: " + this.getCodigo()
-            +"\nNome: " + this.getNome()
-            +"\nDescrição: " + this.getDescricao()
-            +"\nData de Criação: " + this.getDataCriacao()
-            +"\nData Limite: " + this.getDataLimite();
+        return "Código: " + this.getCodigo()
+                + "\nNome: " + this.getNome()
+                + "\nDescrição: " + this.getDescricao()
+                + "\nData de Criação: " + this.getDataCriacao()
+                + "\nData Limite: " + this.getDataLimite();
     }
 
     // Serialização para bytes (salvar em arquivo)

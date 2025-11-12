@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete</title>
+    <link rel="stylesheet" href="../css/delete.css">
+    <link rel="stylesheet" href="../css/topnav.css">
+    <link rel="stylesheet" href="../css/font.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="../js/delete.js" defer></script>
+</head>
+
+<body>
+    <!-- Navegação superior -->
+    <div class="topnav">
+        <a href="home.html">Home</a>
+        <a href="create.html">Create</a>
+        <a href="read.html">Read</a>
+        <a href="update.html">Update</a>
+        <a class="active" href="delete.html">Delete</a>
+    </div>
+
+    <!-- Conteúdo principal -->
+    <div class="main">
+        <div class="controls">
+            <button id="selectAll"><i class="fa-solid fa-check-double"></i> Selecionar Todos</button>
+            <button id="clearSelection"><i class="fa-solid fa-xmark"></i> Limpar Seleção</button>
+            <button id="deleteSelected"><i class="fa-solid fa-trash"></i> Excluir Selecionados</button>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Pesquisar produto...">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        </div>
+
+        <div class="cards-container" id="cardsContainer">
+            <!-- Os cards serão gerados dinamicamente -->
+        </div>
+    </div>
+</body>
+
+</html>

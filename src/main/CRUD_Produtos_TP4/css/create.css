@@ -1,0 +1,135 @@
+.main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 90vh;
+    /* Garante centralização, mas permite crescer */
+    padding: 20px;
+    /* Evita que grude nas bordas em telas pequenas */
+    background-color: #f9fefe;
+    /* opcional, para harmonizar com o tema */
+    box-sizing: border-box;
+}
+
+/* Responsividade para telas menores */
+@media (max-width: 768px) {
+    .main {
+        flex-direction: column;
+        /* empilha conteúdo verticalmente */
+        justify-content: flex-start;
+        /* evita centralizar demais */
+        padding-top: 40px;
+        /* cria um respiro no topo */
+        min-height: auto;
+        /* deixa crescer conforme o conteúdo */
+    }
+}
+
+/* Bordered form */
+form {
+    border: 3px solid rgba(0, 139, 139, 0.2);
+    width: 500px;
+    align-self: center;
+    background-color: #f9fefe;
+    border-radius: 10px;
+}
+
+/* Full-width inputs */
+input[type=text],
+input[type=number] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #009999;
+    box-sizing: border-box;
+    font-size: small;
+    border-radius: 6px;
+    transition: 0.3s;
+}
+
+input[type=text]:focus,
+input[type=number]:focus {
+    border-color: darkcyan;
+    box-shadow: 0 0 6px rgba(0, 139, 139, 0.4);
+    outline: none;
+}
+
+/* Buttons */
+button {
+    background-color: darkcyan;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    border-radius: 6px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    transition: 0.3s;
+    font-size: medium;
+}
+
+/* Button hover */
+button:hover {
+    background-color: rgb(0, 160, 160);
+}
+
+/* Container */
+.container {
+    padding: 16px;
+}
+
+/* Seletor de ícones */
+.icon-selector {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+    justify-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(0, 139, 139, 0.2);
+}
+
+.icon-option {
+    font-size: 30px;
+    color: #666;
+    cursor: pointer;
+    transition: transform 0.2s, color 0.2s, box-shadow 0.2s, background-color 0.2s;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.icon-option:hover {
+    color: darkcyan;
+    transform: scale(1.2);
+    box-shadow: 0 0 5px rgba(0, 139, 139, 0.2);
+}
+
+/* Ícone selecionado */
+.icon-option.selected {
+    color: darkcyan;
+    box-shadow: 0 0 10px rgba(0, 139, 139, 0.5);
+    background-color: rgba(0, 139, 139, 0.1);
+}
+
+/* Ícone grande de preview */
+.selected-icon {
+    font-size: 60px;
+    color: darkcyan;
+    text-align: center;
+    margin-top: 10px;
+}
+
+/* Responsividade */
+@media screen and (max-width: 300px) {
+    span.psw {
+        display: block;
+        float: none;
+    }
+
+    .cancelbtn {
+        width: 100%;
+    }
+}

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/read.css">
+    <link rel="stylesheet" href="../css/topnav.css">
+    <link rel="stylesheet" href="../css/font.css">
+    <script src="../js/read.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Read</title>
+</head>
+
+<body>
+    <!-- Side navigation -->
+    <div class="topnav">
+        <a href="home.html">Home</a>
+        <a href="create.html">Create</a>
+        <a class="active" href="read.html">Read</a>
+        <a href="update.html">Update</a>
+        <a href="delete.html">Delete</a>
+    </div>
+    <div class="main">
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Pesquisar produto...">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        </div>
+
+        <div class="cards-container" id="cardsContainer">
+            <!-- Os cards serão gerados dinamicamente pelo read.js -->
+        </div>
+
+    </div>
+</body>
+
+</html>
