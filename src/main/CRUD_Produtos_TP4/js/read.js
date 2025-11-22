@@ -1,28 +1,137 @@
+// read.js (refeito para o novo formato: arquivo único com header e registros)
+// - header: 2 bytes (ultimoId, uint16)
+// - cada registro: [lapide:1][tamanhoRegistro:2][id:2][nomeLen:2][nomeBytes][gtinLen:2][gtinBytes][descLen:2][descBytes][iconLen:2][iconBytes]
 document.addEventListener("DOMContentLoaded", () => {
+    const STORAGE_KEY = "produtosBin";
+
     const cardsContainer = document.getElementById("cardsContainer");
     const searchInput = document.getElementById("searchInput");
+    const popupOverlay = document.getElementById("popupOverlay");
+    const closePopup = document.getElementById("closePopup");
 
-    // Função para carregar produtos
-    function carregarProdutos() {
-        const produtos = JSON.parse(localStorage.getItem("produtos")) || [];
-        produtos.sort((a, b) => {
-            if (a.nomeProduto < b.nomeProduto) {
-                return -1;
-            }
-            if (a.nomeProduto > b.nomeProduto) {
-                return 1;
-            }
-            return 0;
-        });
+    // ------ Helpers de texto
+    function removerAcentos(texto = "") {
+        return texto.normalize ? texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "") : texto;
+    }
 
+    // ------ Helpers de buffer/localStorage
+    function loadBuffer() {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+            // inicializa header com ultimoId = 0
+            return new Uint8Array(2);
+        }
+        try {
+            const arr = JSON.parse(raw);
+            return new Uint8Array(arr);
+        } catch (e) {
+            console.error("Erro lendo produtosBin do localStorage:", e);
+            return new Uint8Array(2);
+        }
+    }
+
+    function saveBuffer(u8) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(u8)));
+    }
+
+    function readUint16(view, offset) {
+        return view.getUint16(offset); // big-endian (compatível com create.js)
+    }
+
+    // ------ Decodificação de um registro no buffer (a partir de offset)
+    // Retorna { produto, nextOffset, recordBytes } ou null se inválido
+    function decodeRecordAt(buffer, startOffset) {
+        const totalLen = buffer.length;
+        if (startOffset >= totalLen) return null;
+        // precisa ao menos lapide (1) + tamanhoRegistro (2)
+        if (startOffset + 3 > totalLen) return null;
+
+        const view = new DataView(buffer.buffer);
+        let offset = startOffset;
+
+        const lapide = buffer[offset]; offset += 1;
+        const sizeData = readUint16(view, offset); offset += 2;
+
+        // verifica integridade
+        if (offset + sizeData > totalLen) {
+            console.warn("Registro truncado em decodeRecordAt:", startOffset);
+            return null;
+        }
+
+        try {
+            const id = readUint16(view, offset); offset += 2;
+
+            // nome
+            const nomeLen = readUint16(view, offset); offset += 2;
+            const nomeBytes = buffer.slice(offset, offset + nomeLen); offset += nomeLen;
+            const nome = new TextDecoder().decode(nomeBytes || new Uint8Array());
+
+            // gtin
+            const gtinLen = readUint16(view, offset); offset += 2;
+            const gtinBytes = buffer.slice(offset, offset + gtinLen); offset += gtinLen;
+            const gtin = new TextDecoder().decode(gtinBytes || new Uint8Array());
+
+            // descricao
+            const descLen = readUint16(view, offset); offset += 2;
+            const descBytes = buffer.slice(offset, offset + descLen); offset += descLen;
+            const descricao = new TextDecoder().decode(descBytes || new Uint8Array());
+
+            // icone
+            const iconLen = readUint16(view, offset); offset += 2;
+            const iconBytes = buffer.slice(offset, offset + iconLen); offset += iconLen;
+            const icone = new TextDecoder().decode(iconBytes || new Uint8Array()) || "fa-solid fa-box";
+
+            const produto = {
+                id,
+                nomeProduto: nome,
+                gtin,
+                descricao,
+                icone,
+                lapide,
+                ativo: lapide === 0
+            };
+
+            const nextOffset = startOffset + 1 + 2 + sizeData; // lapide(1) + tamanhoRegistro(2) + sizeData
+            return { produto, nextOffset, recordBytes: buffer.slice(startOffset, nextOffset) };
+        } catch (err) {
+            console.error("Erro ao decodificar registro:", err);
+            return null;
+        }
+    }
+
+    // ------ Percorre o buffer inteiro e retorna lista de produtos (somente ativos)
+    function carregarProdutosBinarios() {
+        const buffer = loadBuffer();
+        const produtos = [];
+
+        if (!buffer || buffer.length <= 2) return produtos;
+
+        const view = new DataView(buffer.buffer);
+        const ultimoId = readUint16(view, 0); // header
+        // percorre registros a partir de offset 2
+        let offset = 2;
+        while (offset < buffer.length) {
+            const decoded = decodeRecordAt(buffer, offset);
+            if (!decoded) {
+                console.warn("Leitura interrompida em offset", offset);
+                break;
+            }
+            const { produto, nextOffset } = decoded;
+            if (produto && produto.lapide === 0) produtos.push(produto); // somente ativos por padrão
+            offset = nextOffset;
+        }
+
+        // ordena por nome
+        produtos.sort((a, b) => (a.nomeProduto || "").localeCompare(b.nomeProduto || ""));
         return produtos;
     }
 
-    // Função para exibir os cards
+    // ------ Renderiza os cards na grade
     function exibirProdutos(lista) {
-        cardsContainer.innerHTML = ""; // limpa antes de renderizar
+        if (!cardsContainer) return;
+        cardsContainer.innerHTML = "";
 
-        if (lista.length === 0) {
+        if (!lista || lista.length === 0) {
             cardsContainer.innerHTML = "<p>Nenhum produto encontrado.</p>";
             return;
         }
@@ -31,32 +140,177 @@ document.addEventListener("DOMContentLoaded", () => {
             const card = document.createElement("div");
             card.classList.add("card");
             card.innerHTML = `
-                <i class="${produto.icone}"></i>
-                <h3>${produto.nomeProduto}</h3>
-                <p>${produto.descricao}</p>
-                <p><strong>GTIN:</strong> ${produto.gtin}</p>
-            `;
+        <i class="${produto.icone}"></i>
+        <h3>${produto.nomeProduto}</h3>
+        <p>${produto.descricao}</p>
+        <p><strong>GTIN:</strong> ${produto.gtin}</p>
+      `;
+            card.addEventListener("click", () => abrirPopup(produto));
             cardsContainer.appendChild(card);
         });
     }
 
-    // Exibir todos ao carregar
-    const produtos = carregarProdutos();
-    exibirProdutos(produtos);
-
-    searchInput.addEventListener("input", e => {
-        const termo = removerAcentos(e.target.value.toLowerCase());
-        const filtrados = produtos.filter(p =>
-            removerAcentos(p.nomeProduto.toLowerCase()).includes(termo) ||
-            removerAcentos(p.descricao.toLowerCase()).includes(termo) ||
-            p.gtin.includes(termo)
-        );
-        exibirProdutos(filtrados);
-    });
-
-    // Função auxiliar para remover acentos
-    function removerAcentos(texto) {
-        return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    // ------ Procura o registro bruto (bytes) correspondente a um id, retornando Uint8Array recordBytes
+    function encontrarRecordBytesPorId(id) {
+        const buffer = loadBuffer();
+        if (!buffer || buffer.length <= 2) return null;
+        let offset = 2;
+        while (offset < buffer.length) {
+            const decoded = decodeRecordAt(buffer, offset);
+            if (!decoded) break;
+            const { produto, nextOffset, recordBytes } = decoded;
+            if (produto && produto.id === id) return recordBytes;
+            offset = nextOffset;
+        }
+        return null;
     }
 
+    // ------ Cria bytes de um produto (formato do registro) - fallback para visualização
+    function produtoToRecordBytes(produto) {
+        const encoder = new TextEncoder();
+        const nomeBytes = encoder.encode(produto.nomeProduto || "");
+        const gtinBytes = encoder.encode(produto.gtin || "");
+        const descBytes = encoder.encode(produto.descricao || "");
+        const iconBytes = encoder.encode(produto.icone || "");
+
+        const sizeData =
+            2 + // id
+            2 + nomeBytes.length +
+            2 + gtinBytes.length +
+            2 + descBytes.length +
+            2 + iconBytes.length;
+
+        const recordLen = 1 + 2 + sizeData;
+        const record = new Uint8Array(recordLen);
+        const view = new DataView(record.buffer);
+        let off = 0;
+
+        record[off++] = produto.lapide ? 1 : 0;
+        view.setUint16(off, sizeData); off += 2;
+        view.setUint16(off, produto.id); off += 2;
+
+        view.setUint16(off, nomeBytes.length); off += 2;
+        if (nomeBytes.length) record.set(nomeBytes, off);
+        off += nomeBytes.length;
+
+        view.setUint16(off, gtinBytes.length); off += 2;
+        if (gtinBytes.length) record.set(gtinBytes, off);
+        off += gtinBytes.length;
+
+        view.setUint16(off, descBytes.length); off += 2;
+        if (descBytes.length) record.set(descBytes, off);
+        off += descBytes.length;
+
+        view.setUint16(off, iconBytes.length); off += 2;
+        if (iconBytes.length) record.set(iconBytes, off);
+        off += iconBytes.length;
+
+        return record;
+    }
+
+    // ------ Formata bytes para exibição (hex)
+    function formatBytes(arr) {
+        if (!arr) return "";
+        return Array.from(arr).map(b => b.toString(16).padStart(2, "0").toUpperCase()).join(" ");
+    }
+
+    // ------ Popup: mostra bytes + decodificação passo a passo
+    function abrirPopup(produto) {
+        if (!produto || !popupOverlay) return;
+        popupOverlay.style.display = "flex";
+
+        // Recupera bytes do registro no buffer (busca por id)
+        let recordBytes = encontrarRecordBytesPorId(produto.id);
+        if (!recordBytes) {
+            // fallback: monta record a partir do objeto
+            recordBytes = produtoToRecordBytes(produto);
+        }
+
+        const uint8 = new Uint8Array(recordBytes);
+        const view = new DataView(uint8.buffer);
+        let offset = 0;
+
+        // lê no formato novo
+        const lapide = uint8[offset++]; // 0 = ativo, 1 = removido
+        const sizeData = view.getUint16(offset); offset += 2;
+        const id = view.getUint16(offset); offset += 2;
+
+        const nomeLen = view.getUint16(offset); offset += 2;
+        const nomeBytes = uint8.slice(offset, offset + nomeLen); offset += nomeLen;
+        const nomeText = new TextDecoder().decode(nomeBytes || new Uint8Array());
+
+        const gtinLen = view.getUint16(offset); offset += 2;
+        const gtinBytes = uint8.slice(offset, offset + gtinLen); offset += gtinLen;
+        const gtinText = new TextDecoder().decode(gtinBytes || new Uint8Array());
+
+        const descLen = view.getUint16(offset); offset += 2;
+        const descBytes = uint8.slice(offset, offset + descLen); offset += descLen;
+        const descText = new TextDecoder().decode(descBytes || new Uint8Array());
+
+        const iconLen = view.getUint16(offset); offset += 2;
+        const iconBytes = uint8.slice(offset, offset + iconLen); offset += iconLen;
+        const iconText = new TextDecoder().decode(iconBytes || new Uint8Array()) || "";
+
+        // Preenche popup (assume que os elementos existem no DOM)
+        const el = (idSel) => document.getElementById(idSel);
+        if (el("iconBytes")) el("iconBytes").textContent = formatBytes(iconBytes || []);
+        if (el("iconDecoded")) el("iconDecoded").innerHTML = iconText ? `<i class="${iconText}" style="font-size:40px;color:darkcyan"></i>` : "(nenhum)";
+        if (el("nameBytes")) el("nameBytes").textContent = formatBytes(nomeBytes || []);
+        if (el("nameDecoded")) el("nameDecoded").textContent = nomeText;
+        if (el("gtinBytes")) el("gtinBytes").textContent = formatBytes(gtinBytes || []);
+        if (el("gtinDecoded")) el("gtinDecoded").textContent = gtinText;
+        if (el("descBytes")) el("descBytes").textContent = formatBytes(descBytes || []);
+        if (el("descDecoded")) el("descDecoded").textContent = descText;
+
+        if (el("productPreview")) {
+            el("productPreview").innerHTML = `
+        <div class="card">
+          <i class="${produto.icone}"></i>
+          <h3>${produto.nomeProduto}</h3>
+          <p>${produto.descricao}</p>
+          <p><strong>GTIN:</strong> ${produto.gtin}</p>
+          <p style="margin-top:10px; color:${lapide === 0 ? 'green' : 'red'};">
+            ${lapide === 0 ? 'Ativo' : 'Removido'}
+          </p>
+        </div>
+      `;
+        }
+    }
+
+    // fecha popup
+    if (closePopup) closePopup.addEventListener("click", () => popupOverlay.style.display = "none");
+    if (popupOverlay) {
+        popupOverlay.addEventListener("click", (e) => {
+            if (e.target === popupOverlay) popupOverlay.style.display = "none";
+        });
+    }
+
+    // ------ Pesquisa e filtros
+    function carregarEFiltrar(term = "") {
+        const todos = carregarProdutosBinarios();
+        if (!term) return todos;
+        const termo = removerAcentos(term.toLowerCase());
+        return todos.filter(p =>
+            removerAcentos((p.nomeProduto || "").toLowerCase()).includes(termo) ||
+            removerAcentos((p.descricao || "").toLowerCase()).includes(termo) ||
+            ((p.gtin || "").includes(termo))
+        );
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener("input", (e) => {
+            const term = removerAcentos(e.target.value.toLowerCase());
+            const lista = buildProdutosList();
+            const filtered = lista.filter(p =>
+                removerAcentos((p.nomeProduto || "").toLowerCase()).includes(term) ||
+                removerAcentos((p.descricao || "").toLowerCase()).includes(term) ||
+                ((p.gtin || "").includes(term))
+            );
+            exibirProdutos(filtered);
+        });
+    }
+
+    // inicializa exibindo todos
+    const inicial = carregarProdutosBinarios();
+    exibirProdutos(inicial);
 });
