@@ -1,0 +1,3 @@
+[submodule "src/crud-produtos"]
+	path = src/crud-produtos
+	url = https://github.com/FelipeQLopes/CRUD_Produtos.git
